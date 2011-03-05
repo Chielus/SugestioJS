@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<dwsync>
-<file name="OAuthSignatureMethod.class.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217504726" remote="129429237600000000" />
-<file name="OAuthSignatureMethod_HMAC_SHA1.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217544728" remote="129429237600000000" />
-<file name="OAuthSignatureMethod_MD5.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217604731" remote="129429237600000000" />
-<file name="OAuthSignatureMethod_PLAINTEXT.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217644734" remote="129429237600000000" />
-<file name="OAuthSignatureMethod_RSA_SHA1.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217694736" remote="129429237600000000" />
-</dwsync>

@@ -1,1 +1,0 @@
-easyXDM.DomHelper.requiresJSON("easyXDM/json2.js");
