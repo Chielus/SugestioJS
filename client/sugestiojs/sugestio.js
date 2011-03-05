@@ -3,7 +3,9 @@ function scriptsLoaded() {
         var remoteURL = "http://api.sugestio.com/michiel",
             userid = -1,
             i = 0,
-            submits = "consumptions items users".split(" "),
+            submitTypes = "consumptions items users".split(" "),
+            
+            userRecommendations = "recommendations"
             socket = new easyXDM.Socket({
                 local: "index.html",
                 remote: remoteURL + "/index.html",
@@ -33,6 +35,7 @@ function scriptsLoaded() {
                 userid = a;
             }
         };
+        
         sugestio.recommendations = function (func, scope) {
             if (userid !== -1) {
                 remoteCall('get', ['/sites/sandbox/users/' + userid + '/recommendations.json'], {
@@ -50,6 +53,22 @@ function scriptsLoaded() {
                     }
                 });
             }
+        };
+        sugestio.similarItems = function (itemid,func, scope) {
+            remoteCall('get', ['/sites/sandbox/items/' + itemid + '/similar.json'], {
+                success: function (resp) {
+                    if (typeof func === "function") {
+                        if(typeof scope !== "undefined"){
+                            func.apply(this, [resp]);
+                        } else {
+                            func.apply(scope, [resp]);
+                        }
+                    }
+                },
+                error: function (resp) {
+                    console.log("ERROR: " + resp);
+                }
+            });
         };
 		function getData(data) {
 			var result = {},
@@ -105,7 +124,9 @@ function scriptsLoaded() {
 		function call(submitType,data) {
 			var data2 = getData(data);
 			console.log(data2);
-			data2.userid = userid;
+			if(submitType === "consumptions"){
+			    data2.userid = userid;
+			}
 			remoteCall('post', ['/sites/sandbox/' + submitType, data2], {
 				success: function (resp) {
 					console.log(resp);
@@ -146,6 +167,8 @@ function scriptsLoaded() {
 								break;
                             }
                         }
+                    } else {
+                        call(submitType,data);
                     }
                 };
             })(submits[i]);

@@ -51,12 +51,14 @@ label{
 
 <form id="formUser" method="post" onsubmit="return false;">
 <div class="rating-form">
-<label>Username: </label><input type="text" name="username" value="" />
+<label>Username: </label><input type="text" name="username" value="" /><br />
 <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
 <script type="text/javascript">
-	sugestio.users({idEl: '', genderEl: 1, contentEl: 'div.rating', min: 0, max: 9},'#formUser');
+	sugestio.users({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
 </script>
 <input type="submit" value="Subscribe" />
+<br />
+<a href="item.php?id=2">Go to item 2</a>
 </div>
 </form>
 </body>
