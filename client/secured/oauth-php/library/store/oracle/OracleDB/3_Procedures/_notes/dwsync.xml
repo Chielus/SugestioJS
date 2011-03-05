@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="SP_ADD_CONSUMER_REQUEST_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218574787" remote="129429237600000000" />
+<file name="SP_ADD_LOG.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218604789" remote="129429237600000000" />
+<file name="SP_ADD_SERVER_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218634790" remote="129429237600000000" />
+<file name="SP_AUTH_CONSUMER_REQ_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218664792" remote="129429237600000000" />
+<file name="SP_CHECK_SERVER_NONCE.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218684793" remote="129429237600000000" />
+<file name="SP_CONSUMER_STATIC_SAVE.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218714795" remote="129429237600000000" />
+<file name="SP_COUNT_CONSUMER_ACCESS_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218744797" remote="129429237600000000" />
+<file name="SP_COUNT_SERVICE_TOKENS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218764798" remote="129429237600000000" />
+<file name="SP_DELETE_CONSUMER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218784799" remote="129429237600000000" />
+<file name="SP_DELETE_SERVER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218814801" remote="129429237600000000" />
+<file name="SP_DELETE_SERVER_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218834802" remote="129429237600000000" />
+<file name="SP_DEL_CONSUMER_ACCESS_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218854803" remote="129429237600000000" />
+<file name="SP_DEL_CONSUMER_REQUEST_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218884805" remote="129429237600000000" />
+<file name="SP_EXCH_CONS_REQ_FOR_ACC_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218904806" remote="129429237600000000" />
+<file name="SP_GET_CONSUMER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218934807" remote="129429237600000000" />
+<file name="SP_GET_CONSUMER_ACCESS_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218954809" remote="129429237600000000" />
+<file name="SP_GET_CONSUMER_REQUEST_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218984810" remote="129429237600000000" />
+<file name="SP_GET_CONSUMER_STATIC_SELECT.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219004811" remote="129429237600000000" />
+<file name="SP_GET_SECRETS_FOR_SIGNATURE.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219034813" remote="129429237600000000" />
+<file name="SP_GET_SECRETS_FOR_VERIFY.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219054814" remote="129429237600000000" />
+<file name="SP_GET_SERVER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219084816" remote="129429237600000000" />
+<file name="SP_GET_SERVER_FOR_URI.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219104817" remote="129429237600000000" />
+<file name="SP_GET_SERVER_TOKEN.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219134819" remote="129429237600000000" />
+<file name="SP_GET_SERVER_TOKEN_SECRETS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219154820" remote="129429237600000000" />
+<file name="SP_LIST_CONSUMERS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219184822" remote="129429237600000000" />
+<file name="SP_LIST_CONSUMER_TOKENS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219204823" remote="129429237600000000" />
+<file name="SP_LIST_LOG.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219234825" remote="129429237600000000" />
+<file name="SP_LIST_SERVERS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219264826" remote="129429237600000000" />
+<file name="SP_LIST_SERVER_TOKENS.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219294828" remote="129429237600000000" />
+<file name="SP_SET_CONSUMER_ACC_TOKEN_TTL.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219314829" remote="129429237600000000" />
+<file name="SP_SET_SERVER_TOKEN_TTL.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219344831" remote="129429237600000000" />
+<file name="SP_UPDATE_CONSUMER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219364832" remote="129429237600000000" />
+<file name="SP_UPDATE_SERVER.prc" server="magentodemo.sugestio.com/sugestio-client/" local="129427613219424835" remote="129429237600000000" />
+</dwsync>

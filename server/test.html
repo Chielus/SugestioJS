@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Server website</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript">
+	function initRequest() {
+		var request;
+		if (window.XMLHttpRequest) { // browser ondersteunt XMLHttpRequest
+			if (navigator.userAgent.indexOf('MSIE') != -1) {
+				isIE = true; // browser is internet explorer
+			}
+			request = new XMLHttpRequest();
+		} else if (window.ActiveXObject) { // oudere versies internet explorer
+			isIE = true;
+			request = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		return request;
+	}
+	function callback(req) {
+		if (req.readyState == 4) {  // HTTP-antwoord ontvangen
+			if (req.status == 200) { // aanvraag gelukt
+				console.log(req.responseText); // info ophalen
+			} else {
+				console.log('fout');
+			}
+		}
+	}
+	var url = 'sites/sandbox/users/1/recommendations.json'; // url servlet + parameters
+	var req = initRequest(); // aanvraag-object initialiseren
+	req.open("GET", url, true); // asynchrone GET-aanvraag
+	req.onreadystatechange = function () {
+		callback(req); 
+	};// uit te voeren functie bij antwoord
+	req.send(null); // geen corpus
+</script>
+</head>
+<body>
+<script type="text/javascript" >
+<h1>Server website on sugestio.server</h1>
+</body>
+</html>

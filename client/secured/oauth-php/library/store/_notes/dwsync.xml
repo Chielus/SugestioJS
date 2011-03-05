@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dwsync>
+<file name="OAuthStore2Leg.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217864746" remote="129429237600000000" />
+<file name="OAuthStoreAbstract.class.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217924750" remote="129429237600000000" />
+<file name="OAuthStoreAnyMeta.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613217994754" remote="129429237600000000" />
+<file name="OAuthStoreMySQL.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218074758" remote="129429237600000000" />
+<file name="OAuthStoreMySQLi.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218154763" remote="129429237600000000" />
+<file name="OAuthStoreOracle.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218244768" remote="129429237600000000" />
+<file name="OAuthStorePDO.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218274770" remote="129429237600000000" />
+<file name="OAuthStorePostgreSQL.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218364775" remote="129429237600000000" />
+<file name="OAuthStoreSession.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218394776" remote="129429237600000000" />
+<file name="OAuthStoreSQL.php" server="magentodemo.sugestio.com/sugestio-client/" local="129427613218464781" remote="129429237600000000" />
+</dwsync>
