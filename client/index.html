@@ -12,7 +12,7 @@ label{
 <script type="text/javascript" src="sugestiojs/sugestio.js"></script>
 <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/sizzle/1.4.4/sizzle.min.js"></script>
 <script type="text/javascript">
-	sugestio.user(2);
+	sugestio.user.login(2);
 </script>
 </head>
 <body>
@@ -33,8 +33,7 @@ label{
 </script>
 <button type="button" class="view">View item 1</button>
 <script type="text/javascript">
-	sugestio.consumptions({
-		type: 'VIEW',
+	sugestio.consumptions.view({
 		itemid: 1
 	},'button.view');
 </script>
@@ -54,7 +53,7 @@ label{
 <label>Username: </label><input type="text" name="username" value="" /><br />
 <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
 <script type="text/javascript">
-	sugestio.users({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
+	sugestio.user.meta({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
 </script>
 <input type="submit" value="Subscribe" />
 <br />
