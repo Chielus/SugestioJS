@@ -8,45 +8,51 @@
 label{
 	float: left;	
 }
+p.recommendation{
+    margin: 0px;
+}
 </style>
 <script type="text/javascript" src="sugestiojs/sugestio.js"></script>
 <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/sizzle/1.4.4/sizzle.min.js"></script>
 <script type="text/javascript">
-	sugestio.user.login(2);
+	//sugestio.user.login(2);
 </script>
 </head>
 <body>
 <h1>Client website on sugestio.client</h1>
 <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
+<div id='similar'><p><strong>Similar users:</strong></p></div>
 <script type="text/javascript">
 	//resp is a JSON array. Elements is not obligatory
-	var container = document.getElementById('recommendations');
 	function parseRecommendations(resp){
+	    var container = document.getElementById('recommendations');
 		for(var j=0;j<resp.length;j++){
-			console.log(resp[j]);
 			var p = document.createElement('p');
+			p.className = "recommendation";
 			p.innerHTML = resp[j].itemid;
 			container.appendChild(p);
 		}
 	}
-	sugestio.user.recommendations(parseRecommendations,this,1);
+	
+	function parseSimilar(resp){
+	    var container = document.getElementById('similar');
+        for(var j=0;j<resp.length;j++){
+            var p = document.createElement('p');
+            p.className = "recommendation";
+            p.innerHTML = resp[j].userid;
+            container.appendChild(p);
+        }
+    }
+	var loggedIn = sugestio.user(1);
+	loggedIn.recommendations(parseRecommendations,this);
+	loggedIn.similar(parseSimilar,this);
 </script>
 <button type="button" class="view">View item 1</button>
 <script type="text/javascript">
-	sugestio.consumptions.view({
+	sugestio.user(3).view({
 		itemid: 1
 	},'button.view');
 </script>
-<div class="rating"><label>Rating1: </label></div>
-<br />
-<form id="form1" method="post" onsubmit="return false;"><div class="rating-form"><label>Rating2 in form: </label>
-<script type="text/javascript">
-	sugestio.ratingWidget({type: 'star', itemid: 1, contentEl: 'div.rating', min: 0, max: 9});
-	sugestio.ratingWidget({type: 'star', itemid: 2, contentEl: 'div.rating-form', formEl: '#form1', min: 1, max: 5});
-</script>
-<input type="submit" value="Rate!" />
-</div>
-</form>
 
 <form id="formUser" method="post" onsubmit="return false;">
 <div class="rating-form">
@@ -54,6 +60,7 @@ label{
 <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
 <script type="text/javascript">
 	sugestio.user.meta({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
+	sugestio.user(2).meta({gender: 'F'});
 </script>
 <input type="submit" value="Subscribe" />
 <br />

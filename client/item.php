@@ -11,6 +11,9 @@
 label{
 	float: left;	
 }
+p.recommendation{
+    margin: 0px;
+}
 </style>
 <script type="text/javascript" src="sugestiojs/sugestio.js"></script>
 <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/sizzle/1.4.4/sizzle.min.js"></script>
@@ -29,7 +32,9 @@ label{
     function getUser(){
         return getCookie('userid');
     }
-    sugestio.user.login(getUser,this);
+    var loggedIn = sugestio.user(getUser,this);
+    var item = sugestio.item(<?php echo $_GET['id']; ?>); //GET variabele kan eventueel ook met JavaScript opgehaald worden, POST uiteraard niet
+    console.log(item.id);
 </script>
 </head>
 <body>
@@ -38,27 +43,30 @@ label{
 <div id='similar'><p><strong>Similar items:</strong></p></div>
 <script type="text/javascript">
 	//resp is a JSON array. Elements is not obligatory
-	var container = document.getElementById('similar');
+	
 	function parseSimilar(resp){
+	    var container = document.getElementById('similar');
 		for(var j=0;j<resp.length;j++){
-			console.log(resp[j]);
 			var p = document.createElement('p');
+			p.className = "recommendation";
 			p.innerHTML = resp[j].itemid;
 			container.appendChild(p);
 		}
 	}
-	sugestio.item.similar(<?php echphpphpo $_GET['id']; ?>,parseSimilar,this);
+	item.similar(parseSimilar,this);
 </script>
 <script type="text/javascript">
-	sugestio.consumptions({
-		type: 'VIEW',
-		itemid: <?php echo $_GET['id']; ?> //GET variabele kan eventueel ook met JavaScript opgehaald worden, POST uiteraard niet
+	loggedIn.view({
+		itemid: item.id 
 	});
 </script>
-
+<label>Rating1</label>
+<div class="rating">
+</div><br />
 <form id="form1" method="post" onsubmit="return false;"><div class="rating-form"><label>Rating2 in form: </label>
 <script type="text/javascript">
-	sugestio.ratingWidget({type: 'star', itemid: <?php echo $_GET['id']; ?>, contentEl: 'div.rating-form', formEl: '#form1', min: 1, max: 5});
+    loggedIn.ratingWidget({type: 'star', itemid: item.id, contentEl: 'div.rating', min: 0, max: 9});
+	loggedIn.ratingWidget({type: 'star', itemid: item.id, contentEl: 'div.rating-form', formEl: '#form1', min: 1, max: 5});
 </script>
 <input type="submit" value="Rate!" />
 </div>

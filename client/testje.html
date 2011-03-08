@@ -10,30 +10,60 @@
 	<!-- Date: 2011-03-07 -->
 	<script type="text/javascript">
 	(function (){
-	    function User(firstName){
-	        if(typeof name === "string"){
-                this.firstName = firstName;
+	    var S = {
+            user: function(userid){
+                return new User(userid);
+            },
+            item: function(itemid){
+                return new Item(itemid);
             }
-            else{
-                this.firstName = "unknown";
+        };
+        S.is = function(o, type){
+            type = type.toLowerCase();
+            return  (type == "null" && o === null) ||
+                (type == "id" && (typeof o == "number" || typeof o == "string")) ||
+                (type == typeof o) ||
+                (type == "object" && o === Object(o)) ||
+                (type == "array" && Array.isArray && Array.isArray(o));
+        };
+	    function User(userid){
+	        if(S.is(userid,"id")){
+                this.userid = userid;
+            } else{
+                this.userid = "guest";
             }
-            console.log(this.firstName);
 	    }
-	   function user(firstName){
-            return new User(firstName);
-	   };
-	   User.prototype.hello = function(){
-           alert('Hello '+this.firstName);
+	    User.prototype.url = "userUrl";
+	    function Item(itemid){
+            if(S.is(itemid,"id")){
+                this.itemid = itemid;
+            } else{
+                this.itemid = "guest";
+            }
+        }
+	   User.prototype.meta = function(obj){
+           if(!S.is(obj.id,"id")){
+               obj.id = this.userid;
+           }
+           
+           console.log(this.url);
+           console.log(obj);
        };
-       User.prototype.hello2 = function(){
-           alert('Hello2 '+this.firstName);
+       //S.user.meta = User.prototype.meta;
+       S.user.meta = function(obj){
+           User.prototype.meta.apply(User.prototype,[obj]);
        };
+       
+       S.user.meta({id: "bfeza",t: 1});
+       
+       var loggedIn = S.user("blabla");
+       loggedIn.meta({t: 2});
 
-	   var loggedInUser = user("tester");
+	   /*var loggedInUser = user("tester");
 	   loggedInUser.hello();
 	   loggedInUser.hello2();
 	   
-	   user("temp").hello();
+	   user("temp").hello();*/
     })();
 	</script>
 </head>
