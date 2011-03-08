@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>testje</title>
+	<meta name="generator" content="Studio 3 http://aptana.com/">
+	<meta name="author" content="Chielus">
+	<!-- Date: 2011-03-07 -->
+	<script type="text/javascript">
+	(function (){
+	    function User(firstName){
+	        if(typeof name === "string"){
+                this.firstName = firstName;
+            }
+            else{
+                this.firstName = "unknown";
+            }
+            console.log(this.firstName);
+	    }
+	   function user(firstName){
+            return new User(firstName);
+	   };
+	   User.prototype.hello = function(){
+           alert('Hello '+this.firstName);
+       };
+       User.prototype.hello2 = function(){
+           alert('Hello2 '+this.firstName);
+       };
+
+	   var loggedInUser = user("tester");
+	   loggedInUser.hello();
+	   loggedInUser.hello2();
+	   
+	   user("temp").hello();
+    })();
+	</script>
+</head>
+<body>
+
+</body>
+</html>

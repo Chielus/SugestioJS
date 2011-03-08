@@ -29,7 +29,7 @@ label{
     function getUser(){
         return getCookie('userid');
     }
-    sugestio.user(getUser,this);
+    sugestio.user.login(getUser,this);
 </script>
 </head>
 <body>
@@ -47,7 +47,7 @@ label{
 			container.appendChild(p);
 		}
 	}
-	sugestio.similarItems(<?php echo $_GET['id']; ?>,parseSimilar,this);
+	sugestio.item.similar(<?php echphpphpo $_GET['id']; ?>,parseSimilar,this);
 </script>
 <script type="text/javascript">
 	sugestio.consumptions({

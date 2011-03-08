@@ -20,7 +20,7 @@ label{
 <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
 <script type="text/javascript">
 	//resp is a JSON array. Elements is not obligatory
-	/*var container = document.getElementById('recommendations');
+	var container = document.getElementById('recommendations');
 	function parseRecommendations(resp){
 		for(var j=0;j<resp.length;j++){
 			console.log(resp[j]);
@@ -29,7 +29,7 @@ label{
 			container.appendChild(p);
 		}
 	}
-	sugestio.recommendations(parseRecommendations,this);*/
+	sugestio.user.recommendations(parseRecommendations,this,1);
 </script>
 <button type="button" class="view">View item 1</button>
 <script type="text/javascript">

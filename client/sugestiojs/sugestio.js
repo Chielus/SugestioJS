@@ -1,5 +1,6 @@
 function scriptsLoaded() {
     (function () {
+        //TODO: sugestio.item(2).similar
         var remoteURL = "http://api.sugestio.com/michiel",
             userid = null,
             i = 0,
@@ -44,7 +45,7 @@ function scriptsLoaded() {
                     }
                 }
                 return result;
-            }
+            },
             sugestio = {
                 user: {
                     url: "/sites/sandbox/users",
@@ -226,8 +227,8 @@ function scriptsLoaded() {
             }
             switch(funcDescr.type){
             case 'recommendations':
-                funcDescr.binding[funcDescr.name] = function (func, scope) {
-                    remoteCall('get', [funcDescr.binding.url +funcDescr.name + '.json'], {
+                funcDescr.binding[funcDescr.name] = function (func, scope, id) {
+                    remoteCall('get', [funcDescr.binding.url + '/' + id + '/' + funcDescr.name + '.json'], {
                         success: function (resp) {
                             if (typeof func === "function") {
                                 if(typeof scope !== "undefined"){
