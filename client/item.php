@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Client website</title>
-<link rel="stylesheet" type="text/css" href="sugestiojs/sugestio.css" />
+<link rel="stylesheet" type="text/css" href="SugestioJS/sugestio.css" />
 <style type="text/css">
 label{
 	float: left;	
@@ -15,8 +15,7 @@ p.recommendation{
     margin: 0px;
 }
 </style>
-<script type="text/javascript" src="sugestiojs/sugestio.js"></script>
-<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/sizzle/1.4.4/sizzle.min.js"></script>
+<script type="text/javascript" src="SugestioJS/sugestio.js"></script>
 <script type="text/javascript">
     function getCookie(c_name) {
         var i,x,y,ARRcookies=document.cookie.split(";");

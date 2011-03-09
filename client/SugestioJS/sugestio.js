@@ -1,13 +1,17 @@
+//first load the easyXDM en sizzle scripts, then SugestioJS
 function scriptsLoaded() {
+    //Anonymous function to protect global vars
     (function () {
-        //TODO: sugestio.item(2).similar
         var remoteURL = "http://api.sugestio.com/michiel",
             string = "string",
             nmb = "number",
             i = 0,
             consumptions = "view rating wishlist basket purchase collection checkin".split(" "),
-            S = {
-                user: function(a,b){
+            S = { //sugestio object
+                //sugestio.user: returns the User class
+                //static functions of the User class are functions binded to this function
+                //regular functions are functions bind to the User class
+                user: function(a,b){ 
                     var id = null;
                     //(func,scope) OR
                     //(userid)
@@ -22,6 +26,9 @@ function scriptsLoaded() {
                     }
                     return new User(id);
                 },
+                //sugestio.item: returns the User class
+                //static functions of the User class are functions binded to this function
+                //regular functions are functions bind to the Item class
                 item: function(a,b){
                     var id = null;
                     //(func,scope) OR
@@ -38,6 +45,7 @@ function scriptsLoaded() {
                     return new Item(id);
                 }
             },
+            //easyXDM socket for communicating between 2 iframes
             socket = new easyXDM.Socket({
                 local: "index.html",
                 remote: remoteURL + "/index.html",
@@ -55,6 +63,10 @@ function scriptsLoaded() {
                     }
                 }
             });
+        //if JSON2 is not supported natively by the browser, this API will do the (de)serialization
+        easyXDM.DomHelper.requiresJSON("SugestioJS/easyXDM/json2.js");
+        //gets the values for the Sugestio request
+        //if the key ends with "El", we have to get the value of that DOM Element
         function getSubmitData(data) {
             var result = {},
                 i = 0;
@@ -76,6 +88,7 @@ function scriptsLoaded() {
                         break;
                     default:
                         //multiple elements are only allowed for radioboxes
+                        //TODO: verbeteren
                         try{
                             for (i=0; i<elements.length; i++) {
                                 if (elements[i].nodeName === "INPUT" && elements[i].type === "radio") {
@@ -97,6 +110,8 @@ function scriptsLoaded() {
             }
             return result;
         }
+        //submits the request to the Sugestio API.
+        //url: the REST page
         function submit(inputData,url) {
             var submitData = getSubmitData(inputData);
             if(submitData.type === "RATING"){
@@ -116,29 +131,31 @@ function scriptsLoaded() {
                 }
             });
         }
+        //registers a listener to the trigger elements. If triggered, a request to the Sugestio API will be sent
         function registerSubmit(inputData,url,triggers){
             for (i = 0; i < triggers.length; i++) {
                 switch (triggers[i].nodeName) {
                 case 'BUTTON':
-                    triggers[i].addEventListener('click', function () {
+                    addEvent(triggers[i],'click', function () {
                         submit(inputData,url);
-                    }, false);
+                    });
                     break;
                 case 'INPUT':
-                    triggers[i].addEventListener('change', function () {
+                    addEvent(triggers[i],'change',function () {
                         if (this.checked) {
                             submit(inputData,url);
                         }
-                    }, false);
+                    });
                     break;
                 case 'FORM':
-                    triggers[i].addEventListener('submit', function () {
+                    addEvent(triggers[i],'submit',function () {
                         submit(inputData,url);
-                    }, false);
+                    });
                     break;
                 }
             }
-        }       
+        }
+        //User class
         function User(id){
             if(S.is(id,"id")){
                 this.id = id;
@@ -147,6 +164,7 @@ function scriptsLoaded() {
             }
         }
         User.prototype.url = "/sites/sandbox/users";
+        //Item class
         function Item(id){
             if(S.is(id,"id")){
                 this.id = id;
@@ -155,6 +173,7 @@ function scriptsLoaded() {
             }
         }
         Item.prototype.url = "/sites/sandbox/items";
+        //helper function: checks the type of an object
         S.is = function(o, type){
             type = type.toLowerCase();
             return  (type == "null" && o === null) ||
@@ -163,6 +182,7 @@ function scriptsLoaded() {
                 (type == "object" && o === Object(o)) ||
                 (type == "array" && Array.isArray && Array.isArray(o));
         };
+        //user.meta function
         User.prototype.meta = function(obj,el){
             if(!S.is(obj.id,"id") && typeof obj.idEl === "undefined"){
                 obj.id = this.id;
@@ -179,16 +199,17 @@ function scriptsLoaded() {
                 submit(obj,this.url);
             }
         };
+        //static user.meta function
         S.user.meta = function(obj,el){
             User.prototype.meta.apply(User.prototype,[obj,el]);
         };
+        //consumption functions
         for(i=0;i<consumptions.length;i++){
             (function (consumptionName){
                 User.prototype[consumptionName] = function(obj,el){
                     var url = "/sites/sandbox/consumptions";
                     obj.userid = this.id;
                     obj.type = consumptionName.toUpperCase();
-                    
                     if(S.is(obj.itemid,"id")){
                         if (typeof el !== "undefined") {
                             var triggers = [];
@@ -207,6 +228,7 @@ function scriptsLoaded() {
                 };
             })(consumptions[i]);
         }
+        //item.meta function
         Item.prototype.meta = function(obj,el){
             if(!S.is(obj.id,"id")){
                 obj.id = this.id;
@@ -223,9 +245,11 @@ function scriptsLoaded() {
                 submit(obj,this.url);
             }
         };
+        //static item.meta function
         S.item.meta = function(obj,el){
             Item.prototype.meta.apply(Item.prototype,[obj,el]);
         };
+        //user.recommendations function
         User.prototype.recommendations = function(func,scope){
             if(S.is(func,"function")){
                 remoteCall('get', [this.url + '/' + this.id + '/recommendations.json'], {
@@ -244,6 +268,7 @@ function scriptsLoaded() {
                 console.log("func not given");
             }
         };
+        //similar function
         function similar(func,scope){
             if(S.is(func,"function")){
                 remoteCall('get', [this.url + '/' + this.id + '/similar.json'], {
@@ -264,18 +289,20 @@ function scriptsLoaded() {
         }
         User.prototype.similar = similar;
         Item.prototype.similar = similar;
+        //user.ratingWidget
         User.prototype.ratingWidget = function (data) {
             if (S.is(data,"object") && data.contentEl && data.itemid) {
                 var elements = Sizzle(data.contentEl),
                     i = 0;
                 for (i = 0; i < elements.length; i++) {
                     var el = elements[i];
-                    showRatingWidget.apply(this,[el, data]);
+                    displayRatingWidget.apply(this,[el, data]);
                 }
             }
         };
         window.sugestio = S;
-        function showRatingWidget(el, data) {
+        //displays the rating widget in the DOM element
+        function displayRatingWidget(el, data) {
 			var itemid = data.itemid, 
 			    type = data.type;
             switch (type) {
@@ -347,6 +374,7 @@ function scriptsLoaded() {
             }
         }
         var uuid = 0, remoteCallbacks = {};
+        //easyXDM remote call: see documentation
         function remoteCall(method, params, callbacks) {
             var id = uuid++,
                 request = JSON.stringify({
@@ -359,6 +387,66 @@ function scriptsLoaded() {
         }
     })();
 }
+// Event API by Dean Edwards in orde to simulate the W3C Event binding in IE browsers
+// addEvent/removeEvent written by Dean Edwards, 2005
+// with input from Tino Zijdel
+// http://dean.edwards.name/weblog/2005/10/add-event/
+function addEvent(element, type, handler){
+    // assign each event handler a unique ID
+    if (!handler.$$guid) handler.$$guid = addEvent.guid++;
+    // create a hash table of event types for the element
+    if (!element.events) element.events = {};
+    // create a hash table of event handlers for each element/event pair
+    var handlers = element.events[type];
+    if (!handlers){
+        handlers = element.events[type] = {};
+        // store the existing event handler (if there is one)
+        if (element["on" + type]){
+            handlers[0] = element["on" + type];
+        }
+    }
+    // store the event handler in the hash table
+    handlers[handler.$$guid] = handler;
+    // assign a global event handler to do all the work
+    element["on" + type] = handleEvent;
+};
+// a counter used to create unique IDs
+addEvent.guid = 1;
+/*function removeEvent(element, type, handler){
+    // delete the event handler from the hash table
+    if (element.events && element.events[type]){
+        delete element.events[type][handler.$$guid];
+    }
+};*/
+function handleEvent(event){
+    var returnValue = true;
+    // grab the event object (IE uses a global event object)
+    event = event || fixEvent(window.event);
+    // get a reference to the hash table of event handlers
+    var handlers = this.events[event.type];
+    // execute each event handler
+    for (var i in handlers){
+        this.$$handleEvent = handlers[i];
+        if (this.$$handleEvent(event) === false){
+            returnValue = false;
+        }
+    }
+    return returnValue;
+};
+// Add some "missing" methods to IE's event object
+function fixEvent(event){
+    // add W3C standard event methods
+    event.preventDefault = fixEvent.preventDefault;
+    event.stopPropagation = fixEvent.stopPropagation;
+    return event;
+};
+fixEvent.preventDefault = function(){
+    this.returnValue = false;
+};
+fixEvent.stopPropagation = function(){
+    this.cancelBubble = true;
+};
+//injects a script to the page
 function addScript(src, onload) {
     var script = document.createElement('script'),
         head = document.getElementsByTagName("head")[0];
@@ -369,7 +457,7 @@ function addScript(src, onload) {
     }
     head.appendChild(script);
 }
-addScript('sizzle.js');
-addScript('easyXDM/easyXDM.js', scriptsLoaded);
-//addScript('easyXDM/requiresJSON.js');
-
+//sizzle for getting DOM Elements described by a CSS selector
+addScript('SugestioJS/sizzle.js');
+//easyXDM for cross domain messaging
+addScript('SugestioJS/easyXDM/easyXDM.js', scriptsLoaded);
