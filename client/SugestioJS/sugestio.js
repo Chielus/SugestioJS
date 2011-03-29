@@ -2,7 +2,7 @@
 function scriptsLoaded() {
     //Anonymous function to protect global vars
     (function () {
-        var remoteURL = "http://api.sugestio.com/michiel",
+        var remoteURL = (document.domain==='sugestio.client' ? "http://api.sugestio.com/michiel" : "http://js.sugestio.com/michiel"),
             string = "string",
             nmb = "number",
             i = 0,
@@ -204,6 +204,7 @@ function scriptsLoaded() {
             User.prototype.meta.apply(User.prototype,[obj,el]);
         };
         //consumption functions
+        //TODO: omvormen naar closure!
         for(i=0;i<consumptions.length;i++){
             (function (consumptionName){
                 User.prototype[consumptionName] = function(obj,el){
