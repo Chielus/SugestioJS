@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><HTML>
+<HEAD>
+<TITLE></TITLE>
+</HEAD>
+<BODY>
+<A name=1></a><IMG src="voorstel-1_1.png"><br>
+ <br>
+ <br> <br><b>DEPARTEMENT TOEGEPASTE INGENIEURSWETENSCHAPPEN </b><br>
+CAMPUS SCHOONMEERSEN  - GENT <br>
+ <br>
+<h1>Uitgebreid voorstel Masterproef Informatica </h1>
+<p><a href="voorstel.pdf">PDF versie</a></p>
+ <br>
+Datum : 18 december 2010 <br>
+Naam student : Michiel Gyssels <br>
+Algemene informatie : <br>
+Naam van het bedrijf : IBBT / Universiteit Gent - INTEC - WiCa <br>
+Is er in het bedrijf inhoudelijke en technische begeleiding beschikbaar ? <b>Ja</b>/Nee <br>
+ <br>
+Externe promotor(en) : Luc Martens, Toon De Pessemier, Simon Dooms <br>
+ <br>
+E-mailadres externe promotor(en): <br>
+Simon.Dooms@intec.ugent.be,Toon.DePessemier@intec.ugent.be <br>
+ <br> <br>
+Interne promotor : Rudy Stoop <br>
+ <h2>Titel van het project </h2>
+Studie naar een veilig en fraude ongevoelig framework voor het aanleveren van <br>
+gepersonaliseerde web content. <br>
+ <h2>Doelstelling van het project </h2>
+De doelstel ing van de masterproef is het maken van een veilig en fraude <br>
+ongevoelig framework voor het leveren van gepersonaliseerde aanbevelingen. <br>
+ <h2>Bestaande situatie en probleemstelling </h2>
+ <div style="float:right">
+    <IMG src="sugestio1.png"><br>
+    <i>Fig. 1: Sugestio </i>
+</div>
+ <br>Sugestio (zie figuur 1 en 2) is een krachtig <br>
+aanbevelingsplatform gemaakt binnen de onderzoeksgroep <br>
+WiCa van Universiteit Gent. Een website kan, door gebruik te <br>
+maken van Sugestio, aan zijn bezoekers gepersonaliseerde <br>
+aanbevelingen doen. Afhankelijk van het soort website kunnen <br>
+zo bepaalde items zoals bv. producten (E-Commerce), <br>
+vrienden (sociale netwerksites) of artikelen (blogs of <br>
+nieuwssites) uit de catalogus van de website aanbovelen <br>
+worden aan de bezoeker.  <br>
+De waarschijnlijkheid dat die bezoeker aanbevolen items krijgt <br>
+die in zijn interessegebied vallen moet zo groot mogelijk zijn. <br>
+
+Hoe beter deze gepersonaliseerde aanbevelingen zijn, hoe meer <br>
+tevreden de bezoeker zal zijn over de website. Dit kan zich in het geval van een E-<br>
+Commerce website bijvoorbeeld vertalen in meer winst. <br>
+Pagina <b>1</b> van <b>7</b> <br>
+ <br>
+<hr>
+<br>
+De ontwikkelaar van de (consumer) website die <br>
+gebruik maakt van de Sugestio webservice moet <br>
+tevens geen kostbare tijd steken in het eigenhandig <br>
+ontwikkelen van complexe aanbevelingsalgoritmen. <br>
+De consumer website bespaart op die manier ook op <br>
+laadtijd en belasting van zijn server, de Sugestio <br>
+service beschikt namelijk over een krachtige cloud <br>
+gebaseerde infrastructuur. <br>
+ <br>De authenticatie van de Sugestio API is beveiligd met <br>
+de OAuth1.0a specificatie. OAuth (of Open <br>
+Authorization) is een open protocol voor beveiligde API <br>
+
+<div style="float:right;"><IMG style="float:right;" src="sugestio2.png"><br>
+<i>Fig. 2: Stroming tussen </i><br />
+<i>User, Consumer en Provider</i>
+</div>
+autorisatie via een standaard en een eenvoudige methode  <i>User, consumer en </i><br>
+voor zowel desktop- als webapplicaties. De standaardvorm is 3-legged. Daarbij wil een bepaalde <br>
+applicatie (de consumer) data gebruiken over zijn bezoeker (de user) van een <br>
+service provider (de provider). In deze 3-legged OAuth vorm zal de user gevraagd <br>
+worden of hij/zij de gegevens over hem/haar, die de service provider bezit, wilt <br>
+delen met de consumer applicatie. Er bestaat ook nog een 2-legged variant, ook <br>
+gekend als de <i>signed-fetch</i> variant. Bij deze variant is de consumer gerechtigd om <br>
+in de naam van al zijn gebruikers te handelen. De user moet dus niet de consumer <br>
+applicatie autoriseren en het wordt dan ook meer gebruikt als authenticatie tussen <br>
+de consumer en de service provider. Sugestio gebruikt de 2-legged variant. <br>
+ <br>Samengevat werkt de 3-legged vorm van OAuth volgens deze stappen (zie figuur <br>
+3): 1. Registreren van de consumer bij de provider. Dit zal manueel moeten <br>
+gebeuren door de consumer developer. Hierbij krijgt de consumer een <br>
+consumer key en een consumer secret. De combinatie van deze 2 noemt men <br>
+ook wel het consumer key-paar. De consumer zal deze ergens moeten <br>
+opslaan voor gebruik. <br>
+2.  De consumer kan aan de user vragen of hij gegevens, over de betreffende <br>
+user van de service provider, wil delen met de consumer. De consumer zal <br>
+dan een OAuth autorisatie (ook wel een OAuth dans genoemd) starten met de <br>
+service provider waarbij de consumer enkele OAuth parameters en zijn <br>
+consumer key-paar moet meegeven (A). Door middel van het consumer key-<br>
+paar weet de service provider welke consumer toegang vraagt tot gegevens <br>
+van hem, de consumer wordt dus door dit sleutelpaar geauthenticeerd. Na <br>
+deze stap krijgt de consumer een <i>request token</i> terug van de provider (B). <br>
+Dit is een random tekenreeks met een private sleutel die als bewijs geldt dat <br>
+de consumer momenteel geauthenticeerd is. In de figuur wordt de request <br>
+token oauth_token (met zijn secret) genoemd. <br>
+3.  Indien de consumer geauthenticeerd is door de service provider gebeurt er nu <br>
+een redirect naar een pagina van de provider (C). Bij deze redirect moet de <br>
+verkregen request token meestal meegegeven worden. Indien dit echter niet <br>
+verplicht is door de provider dan verwacht de provider dat de user de request <br>
+token manueel invult. Bij deze pagina wordt de user gevraagd of hij de <br>
+toestemming wil geven aan die consumer om zijn gegevens die de provider <br>
+Pagina <b>2</b> van <b>7</b> <br>
+ <br>
+<hr>
+
+heeft te delen met de consumer. Indien de user nog niet geauthenticeerd was <br>
+op de site van de provider moet dit uiteraard eerst nog gebeuren. OAuth <br>
+specificeert niet hoe dit moet gebeuren, meestal wordt dit met een gewoon <br>
+loginformulier gedaan. <br>
+4.  Na authenticatie van de gebruiker gebeurt er opnieuw een redirect naar een <br>
+pagina van de consumer (D). Als de gebruiker akkoord ging in de vorige stap <br>
+is de request token nu geautoriseerd. De consumer kan nu de request token <br>
+omwisselen voor een access token (E+F). Deze access token is het <br>
+eindproduct van het hele OAuth stappenplan. <br>
+5.  De consumer heeft nu toegang tot de gegevens van de user die de service <br>
+provider heeft en kan deze opvragen door methodes van provider API op te <br>
+roepen (G). Bij deze aanvragen moet de consumer de verkregen access token <br>
+samen met andere OAuth parameters en zijn consumer key-paar meegeven. <br>
+ <br>
+<IMG src="voorstel-3_1.png"><br>
+<i>Fig. 3: OAuth authenticatie stroming </i><br><br>
+Bij de 2-legged variant gebeuren stappen A en B identiek en dan eindigt de dans. <br>
+De verkregen request token in termen van 3-legged OAuth is nu de access token <br>
+voor de 2-legged variant. Door zijn diensten te beveiligen met deze 2-legged <br>
+variant weet Sugestio bij een aanvraag voor zijn diensten dat de zender wel degelijk <br>
+een geldige consumer is en geen aanvaller die fraude wil plegen. De user hoeft geen <br>
+weet te hebben dat de aanbevelingen gedaan worden door de Sugestio service en <br>
+moet dus zeker de consumer niet autoriseren voor de gegevens waarover Sugestio <br>
+beschikt. <br>
+ <br>Er zijn reeds libraries voor Sugestio beschikbaar in Java, PHP, Python en .NET. Deze <br>
+implementeren allemaal OAuth, wat opnieuw wat werk bespaart voor de consumer <br>
+Pagina <b>3</b> van <b>7</b> <br>
+ <br>
+<hr>
+<A name=4></a>developer. Het probleem dat men ondervindt, is dat klanten nog teveel <br>
+integratiewerk in hun website hebben om van de webservice gebruik te maken. Om <br>
+Sugestio aan te spreken via een library werkt men met een systeem van <i>hooking</i>. <br>
+Dit wil zeggen dat bij aanmaak van een item (bv. een pagina, product of <br>
+nieuwsbericht) of bij bepaalde consumpties door de gebruiker (bv. een page view) <br>
+de Sugestio library hierop moet inhaken om deze gebeurtenissen te melden aan de <br>
+Sugestio webservice. <br>
+Voor het verkrijgen van aanbevelingen moet er op dezelfde manier gewerkt worden. <br>
+De output die de Sugestio webservice aanbiedt, is verkrijgbaar in de formaten CSV, <br>
+JSON of XML. De consumer ontwikkelaar moet deze informatie echter nog parsen en <br>
+in zijn systeem invoeren. <br>
+Een oplossing hiervoor zou een client-side library zijn die de consumer developer <br>
+meer eenvoud maar toch alle functionaliteit en de nodige beveiliging kan aanbieden. <br>
+Het beveiligen van een client-side library is echter geen evidente zaak. Dit komt <br>
+omdat de client (in ons geval de user) steeds aan de broncode kan, waardoor men <br>
+geen code kan afschermen van de gebruiker. Aanvallers kunnen tevens van <br>
+bepaalde lekken gebruik kan maken om eigen code te injecteren (Cross-site <br>
+scripting). <br>
+ <h2>Gedetailleerde omschrijving van de opdracht </h2>
+ <br>Er wordt eerst een studie gedaan naar de OAuth specificaties en de problemen met <br>
+betrekking tot client-side scripting. Er zal onderzoek gebeuren naar mogelijkheden <br>
+hoe  toch op een veilige manier OAuth gebruikt kan worden met client-side <br>
+scripting. Verschil ende oplossingen zullen in een haalbaarheidsstudie kritisch met <br>
+elkaar vergeleken worden. <br>
+Vervolgens wordt er een proof of concept met de beste oplossing gemaakt in de <br>
+vorm van een client-side library voor de Sugestio API. Deze library moet op een <br>
+eenvoudige manier de webservice integreren met de consumer website.  <br>
+De library zal in JavaScript ontwikkeld worden. Andere mogelijkheden zijn bv. <br>
+Jscript, VBScript of PerlScript. JavaScript geniet echter veel meer ondersteuning <br>
+door browsers en hosts. <br>
+ <br>In Figuur 4 is een voorbeeld afgebeeld van de verwachte stroom tussen client en de <br>
+library. De consumer website moet eerst de Sugestio JavaScript library (SugestioJS) <br>
+in zijn website opnemen (<i>embedden</i>). Hierna zal de library de 2-legged OAuth dans <br>
+uitvoeren en de verkregen access token bijhouden tijdens de sessie.  <br>
+De consumer kan nu consumpties of gegevens doorsturen via de library naar de <br>
+Sugestio webservice. De consumer kan de library ook aanbevelingen laten <br>
+genereren in een html-element (de <i>output container</i>). <br>
+Pagina <b>4</b> van <b>7</b> <br>
+ <br>
+<hr>
+<A name=5></a><IMG src="voorstel-5_1.png"><br>
+ <br>
+<i>Fig. 4: Verwachte stroming tussen consumer, library en Sugestio </i><br>
+ <br>
+<i> </i>
+<h2>Problemen die moeten opgelost worden </h2>
+ <br>De OAuth1.0a specificatie is in zijn standaardvorm moeilijk veilig te gebruiken met <br>
+enkel en al een client-side scripting. Dit komt omdat de consumer het private <br>
+consumer key-paar moet opslaan en meegeven tijdens een OAuth dans, bij de <br>
+stappen A, E en G van figuur 3. Als dit paar publiek wordt, kan een aanvaller zich <br>
+gemakkelijk authenticeren als de consumer en dus methodeaanroepen naar de <br>
+webservice vervalsen. <br>
+Indien het consumer-key paar opgeslagen wordt aan de client-side<i> </i>zijn deze steeds <br>
+zichtbaar voor bezoekers. Het volstaat voor die bezoeker om bv. de html-broncode <br>
+te bekijken. Ook de code uiterst ingewikkeld maken (<i>obfuscaten</i>) biedt geen <br>
+oplossing aangezien men nog altijd <i>reverse engineering</i> kan toepassen. Hier zal een <br>
+oplossing voor moeten worden gevonden om het gebruik van OAuth toch mogelijk <br>
+te maken. <br>
+ <br>Wegens beveiligingsredenen is JavaScript onderhevig aan het same origin policy. <br>
+Het same origin policy verbiedt een JS script de toegang aan de meeste methodes <br>
+en attributen van een andere pagina op een ander domein. Aangezien de Sugestio <br>
+een RESTful webservice is wil en we voor de Sugestio JavaScript library Ajax <br>
+gebruiken om methodes van de webservice aan te roepen. De XmlHttpRequest API <br>
+is helaas ook onderhevig aan de same origin policy. Hierdoor kan de consumer <br>
+website die de SugestioJS library gebruikt geen XmlHttpRequests uitvoeren naar de <br>
+Sugestio webservice aangezien de consumer website zich op een ander domein <br>
+bevindt dan de Sugestio webservice.  <br>
+Pagina <b>5</b> van <b>7</b> <br>
+ <br>
+<hr>
+<A name=6></a>
+<h2>Technologieën die aan bod komen </h2>
+JavaScript, HTML, CSS, OAuth, PHP, Java, beveiliging <br>
+ <br>Ondanks het feit dat JavaScript al lang bestaat, is het nog steeds een sterk <br>
+groeiende taal. Vroeger werd het omschreven als ‘s werelds meest misbegrepen <br>
+programmeertaal omdat men het vaak als een onvolwaardige OO-taal beschouwde <br>
+(Crockford,2001). Het biedt echter wel OO-principes als overerving, compositie en <br>
+private variabelen aan en het ondersteunt daarbij ook alle belangrijke design <br>
+patterns (Diaz &amp; Harmes, 2008). Door zijn beperkte syntax, functional scoping en <br>
+het gebruik van closures is het echter allemaal minder voor de hand liggend dan bij <br>
+programmeertalen zoals Java en C++. <br>
+Sinds de komst van AJAX, de mobiele revolutie en populaire libraries als jQuery en <br>
+YUI zien meer en meer programmeurs de sterktes van JavaScript in en is het sterk <br>
+geëvolueerd naar een professioneler karakter. <br>
+ <br>JavaScript biedt zo de mogelijkheid aan om vele taken, die vroeger steevast aan de <br>
+server-side gedaan werden, naar de client-side te brengen. Dit zorgt voor een grote <br>
+verbetering van schaalbaarheid en snelheid van de applicaties. <br>
+ <h2>Mogelijke uitbreidingen en opties </h2>
+ <ul>
+     <li>We kunnen nooit verwachten een beveiligingsmethode vol edig waterdicht is. <br>
+Daardoor zullen we, indien er nog voldoende tijd over is, ook nog <br>
+fraudedetectie moeten ontwikkelen. De fraudedetectie voor Sugestio kan men <br>
+opsplitsen in 2 verschillende situaties:
+        <ul>
+     <li>Fraudedetectie bij onbeveiligde REST calls van de client naar de Sugestio</li>
+     <li>Fraudedetectie bij beveiligde REST calls door abnormaal gedrag op te <br>
+sporen, dat zich mogelijk nog kan voordoen bij het toepassen van een webservice.<br>
+beveiligde oplossing. <br></li>
+        </ul>
+     </li>
+ </ul>
+Fraudedetectie is onmogelijk aan de client-side en zal dus aan de kant van de <br>
+Sugestio server moeten gebeuren. <br>
+ <h2>Vernieuwende aspecten </h2>
+Voor het integreren van aanbevelingen in websites bestaan tegenwoordig al heel <br>
+wat mogelijkheden. Deze werken echter al emaal onbeveiligd zonder enige vorm <br>
+van authenticatie. Daardoor zijn deze services niet fraudeongevoelig, een aanvaller <br>
+kan bv. gemakkelijk de aanbevelingen manipuleren door zelf aanroepen naar die <br>
+webservices na te maken. <br>
+ <br> <br>
+ <br>
+Pagina <b>6</b> van <b>7</b> <br>
+ <br>
+<hr>
+<h2>Overzicht van de items die in de scriptietekst zullen behandeld worden  </h2>
+<ul>
+    <li>Inleiding</li>
+    <li>Beschrijving van Sugestio</li>
+    <li>Probleemstelling</li>
+    <li>Literatuurstudie over OAuth</li>
+    <li>Mogelijke oplossingen van het probleem</li>
+        <ul>
+            <li>haalbaarheidstudie</li>
+            <li>suggesties voor fraudedetectie specifiek per oplossing</li>
+        </ul>
+    <li>Uitwerken van de usecases</li>
+    <li>Ontwikkeling van de Sugestio JavaScript Library</li>
+    <li>Uitgewerkte fraudedetectie (uitbreiding)</li>
+    <li>Testen</li>
+    </ul>
+ <h2>Referenties </h2>
+ <ul>
+     <li>JavaScript, the world's most misunderstood programming language (Douglas Crockford, 2001) geraadpleegd op 04/12/2010 via <a href="http://javascript.crockford.com/javascript.html">http://javascript.crockford.com/javascript.html</a></li>
+     <li>Pro JavaScript Design Patterns (Dustin Diaz &amp; Ross Harmes, 2008)</li>
+     <li>OAuth flow. Geraadpleegd op 04/12/2010 via <a href="http://oauth.net/core/diagram.png">http://oauth.net/core/diagram.png</a></li>
+     <li>Sugestio, recommendations as a service. Geraadpleegd op 04/12/2010 via <a href="http://www.sugestio.com">http://www.sugestio.com</a></li>
+     <li>OAuth community site. Geraadpleegd op 12/12/2010 via <a href="http://www.oauth.net">http://www.oauth.net</a></li>
+ </ul>
+  <br>
+Pagina <b>7</b> van <b>7</b> <br>
+ <br>
+<hr>
+</BODY>
+</HTML>
