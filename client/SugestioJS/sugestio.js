@@ -1,8 +1,9 @@
-//first load the easyXDM en sizzle scripts, then SugestioJS
+//first load the easyXDM en  scripts, then SugestioJS
 function scriptsLoaded() {
     //Anonymous function to protect global vars
     (function () {
-        var remoteURL = (document.domain==='sugestio.client' ? "http://api.sugestio.com/michiel" : "http://js.sugestio.com/michiel"),
+        var remoteURL = "http://js.sugestio.com/michiel",
+            signerURL = "http://jsdemo.sugestio.com/demo/signer.php",
             string = "string",
             nmb = "number",
             i = 0,
@@ -77,10 +78,10 @@ function scriptsLoaded() {
                 if(endsWithEl.test(dataKey)){
                     //get the current value of that data field
                     var newKey = dataKey.replace(endsWithEl, "");
-                    if (typeof dataValue === "string") {
-                        elements = Sizzle(dataValue);
-                    } else {
+                    if (typeof dataValue === "object") {
                         elements = dataValue;
+                    } else {
+                        console.log("elements not given");
                     }
                     switch(elements.length) {
                     case 1:
@@ -122,37 +123,62 @@ function scriptsLoaded() {
                     delete submitData.rating;
                 }
             }
-            remoteCall('post', [url, submitData], {
-                success: function (resp) {
-                    console.log(resp);
+            $.ajax({
+                'type': 'POST',
+                'url': signerURL,
+                'data': {
+                    'request': 'http://js.sugestio.com'+url,
+                    'method': 'POST',
+                    'params': JSON.stringify(submitData)
                 },
-                error: function (resp) {
-                    console.log("ERROR with " + url + ": " + resp);
-                }
+                success: function(resp){
+                    var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
+                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ",'');
+                    remoteCall('post', [url, xauth, auth, submitData], {
+                        success: function (resp) {
+                            //console.log(resp);
+                        },
+                        error: function (resp) {
+                            console.log("ERROR with " + url + ": " + resp);
+                        }
+                    });
+                },
+                error: function(jqXHR,textStatus,errorThrown){
+                    console.log("error when contacting signer page");
+                },
+                dataType: 'xml'
             });
         }
         //registers a listener to the trigger elements. If triggered, a request to the Sugestio API will be sent
         function registerSubmit(inputData,url,triggers){
-            for (i = 0; i < triggers.length; i++) {
-                switch (triggers[i].nodeName) {
-                case 'BUTTON':
-                    addEvent(triggers[i],'click', function () {
-                        submit(inputData,url);
-                    });
-                    break;
-                case 'INPUT':
-                    addEvent(triggers[i],'change',function () {
-                        if (this.checked) {
+            if (!S.is(triggers,"array") && S.is(triggers,"object")) {
+                triggers = [triggers];
+            }
+            if(S.is(triggers,"array")){
+                for (i = 0; i < triggers.length; i++) {
+                    //console.log(triggers[i].nodeName);
+                    switch (triggers[i].nodeName) {
+                    case 'BUTTON':
+                        addEvent(triggers[i],'click', function () {
                             submit(inputData,url);
-                        }
-                    });
-                    break;
-                case 'FORM':
-                    addEvent(triggers[i],'submit',function () {
-                        submit(inputData,url);
-                    });
-                    break;
-                }
+                        });
+                        break;
+                    case 'INPUT':
+                        addEvent(triggers[i],'change',function () {
+                            if (this.checked) {
+                                submit(inputData,url);
+                            }
+                        });
+                        break;
+                    case 'FORM':
+                        addEvent(triggers[i],'submit',function () {
+                            submit(inputData,url);
+                        });
+                        break;
+                    }
+                } 
+            } else {
+                submit(inputData,url); //triggers is not an object or array => submit the call instantly
             }
         }
         //User class
@@ -163,7 +189,7 @@ function scriptsLoaded() {
                 this.id = null;
             }
         }
-        User.prototype.url = "/sites/sandbox/users";
+        User.prototype.url = "/sites/magento/users";
         //Item class
         function Item(id){
             if(S.is(id,"id")){
@@ -172,80 +198,47 @@ function scriptsLoaded() {
                 this.id = null;
             }
         }
-        Item.prototype.url = "/sites/sandbox/items";
+        Item.prototype.url = "/sites/magento/items";
         //helper function: checks the type of an object
         S.is = function(o, type){
             type = type.toLowerCase();
             return  (type == "null" && o === null) ||
                 (type == "id" && (typeof o == "number" || typeof o == "string")) ||
                 (type == typeof o) ||
-                (type == "object" && o === Object(o)) ||
-                (type == "array" && Array.isArray && Array.isArray(o));
+                (type == "array" && Object.prototype.toString.call(o) === '[object Array]') ||
+                (type == "object" && o === Object(o) && Object.prototype.toString.call(o) !== '[object Array]');
         };
-        //user.meta function
-        User.prototype.meta = function(obj,el){
+        function meta(obj,el){
             if(!S.is(obj.id,"id") && typeof obj.idEl === "undefined"){
                 obj.id = this.id;
             }
-            if (typeof el !== "undefined") {
-                var triggers = [];
-                if (typeof el === "string") {
-                    triggers = Sizzle(el);
-                } else {
-                    triggers.push(el);
-                }
-                registerSubmit(obj,this.url,triggers);
-            } else {
-                submit(obj,this.url);
-            }
-        };
+            registerSubmit(obj,this.url,el);
+        }
+        //user.meta function
+        User.prototype.meta = meta;
         //static user.meta function
         S.user.meta = function(obj,el){
             User.prototype.meta.apply(User.prototype,[obj,el]);
         };
-        //consumption functions
-        //TODO: omvormen naar closure!
-        for(i=0;i<consumptions.length;i++){
-            (function (consumptionName){
-                User.prototype[consumptionName] = function(obj,el){
-                    var url = "/sites/sandbox/consumptions";
+        //consumption function closure
+        function getConsumptionFunction(consumptionName){
+            return function(obj,el){
+                var url = "/sites/sandbox/consumptions";
+                if(!S.is(obj.userid,"id") && typeof obj.useridEl === "undefined"){
                     obj.userid = this.id;
-                    obj.type = consumptionName.toUpperCase();
-                    if(S.is(obj.itemid,"id")){
-                        if (typeof el !== "undefined") {
-                            var triggers = [];
-                            if (typeof el === "string") {
-                                triggers = Sizzle(el);
-                            } else {
-                                triggers.push(el);
-                            }
-                            registerSubmit(obj,url,triggers);
-                        } else {
-                            submit(obj,url);
-                        }
-                    } else{
-                        console.log("itemid not given");
-                    }
-                };
-            })(consumptions[i]);
+                }
+                obj.type = consumptionName.toUpperCase();
+                registerSubmit(obj,url,el);
+            };
+        }
+        for(i=0;i<consumptions.length;i++){
+            User.prototype[consumptions[i]] = getConsumptionFunction(consumptions[i]);
+            S[consumptions[i]] = function(obj,el){
+                User.prototype.rating.apply(User.prototype,[obj,el]);
+            };
         }
         //item.meta function
-        Item.prototype.meta = function(obj,el){
-            if(!S.is(obj.id,"id")){
-                obj.id = this.id;
-            }
-            if (typeof el !== "undefined") {
-                var triggers = [];
-                if (typeof el === "string") {
-                    triggers = Sizzle(el);
-                } else {
-                    triggers.push(el);
-                }
-                registerSubmit(obj,this.url,triggers);
-            } else {
-                submit(obj,this.url);
-            }
-        };
+        Item.prototype.meta = meta;
         //static item.meta function
         S.item.meta = function(obj,el){
             Item.prototype.meta.apply(Item.prototype,[obj,el]);
@@ -253,17 +246,36 @@ function scriptsLoaded() {
         //user.recommendations function
         User.prototype.recommendations = function(func,scope){
             if(S.is(func,"function")){
-                remoteCall('get', [this.url + '/' + this.id + '/recommendations.json'], {
-                    success: function (resp) {
-                        if(S.is(scope,"object")){
-                            func.apply(scope, [resp]);
-                        } else {
-                            func.apply(this, [resp]);
-                        }
+                var APIurl = this.url,
+                    id = this.id;
+                $.ajax({
+                    'type': 'POST',
+                    'url': signerURL,
+                    'data': {
+                        'request': 'http://js.sugestio.com'+APIurl + '/' + id + '/recommendations.json',
+                        'method': 'GET',
+                        'params': []
                     },
-                    error: function (resp) {
-                        console.log("ERROR: " + resp);
-                    }
+                    success: function(resp){
+                        var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
+                            auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ",'');
+                        remoteCall('get', ['http://js.sugestio.com'+APIurl + '/' + id + '/recommendations.json', xauth, auth], {
+                            success: function (resp) {
+                                if(S.is(scope,"object")){
+                                    func.apply(scope, [resp]);
+                                } else {
+                                    func.apply(this, [resp]);
+                                }
+                            },
+                            error: function (resp) {
+                                console.log("ERROR: " + resp);
+                            }
+                        });
+                    },
+                    error: function(jqXHR,textStatus,errorThrown){
+                        console.log("error when contacting signer page");
+                    },
+                    dataType: 'xml'
                 });
             } else {
                 console.log("func not given");
@@ -272,18 +284,38 @@ function scriptsLoaded() {
         //similar function
         function similar(func,scope){
             if(S.is(func,"function")){
-                remoteCall('get', [this.url + '/' + this.id + '/similar.json'], {
-                    success: function (resp) {
-                        if(S.is(scope,"object")){
-                            func.apply(scope, [resp]);
-                        } else {
-                            func.apply(this, [resp]);
-                        }
+                var APIurl = this.url,
+                    id = this.id;
+                $.ajax({
+                    'type': 'POST',
+                    'url': signerURL,
+                    'data': {
+                        'request': 'http://js.sugestio.com'+APIurl + '/' + id + '/similar.json',
+                        'method': 'GET',
+                        'params': []
                     },
-                    error: function (resp) {
-                        console.log("ERROR: " + resp);
-                    }
+                    success: function(resp){
+                        var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
+                            auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ",'');
+                        remoteCall('get', ['http://js.sugestio.com'+APIurl + '/' + id + '/similar.json', xauth, auth], {
+                            success: function (resp) {
+                                if(S.is(scope,"object")){
+                                    func.apply(scope, [resp]);
+                                } else {
+                                    func.apply(this, [resp]);
+                                }
+                            },
+                            error: function (resp) {
+                                console.log("ERROR: " + resp);
+                            }
+                        });
+                    },
+                    error: function(jqXHR,textStatus,errorThrown){
+                        console.log("error when contacting signer page");
+                    },
+                    dataType: 'xml'
                 });
+                
             } else {
                 console.log("func not given");
             }
@@ -291,89 +323,91 @@ function scriptsLoaded() {
         User.prototype.similar = similar;
         Item.prototype.similar = similar;
         //user.ratingWidget
-        User.prototype.ratingWidget = function (data) {
+        S.ratingWidget = function (data) {
             if (S.is(data,"object") && data.contentEl && data.itemid) {
-                var elements = Sizzle(data.contentEl),
-                    i = 0;
-                for (i = 0; i < elements.length; i++) {
-                    var el = elements[i];
-                    displayRatingWidget.apply(this,[el, data]);
+                if(S.is(data.contentEl,"object") || S.is(data.contentEl,"array")){
+                    var elements = data.contentEl,
+                        i = 0;
+                    for (i = 0; i < elements.length; i++) {
+                        var el = elements[i];
+                        displayRatingWidget.apply(this,[el, data]);
+                    }
+                }
+            }
+            //displays the rating widget in the DOM element
+            function displayRatingWidget(el, data) {
+                var itemid = data.itemid,
+                    type = data.type;
+                switch (type) {
+                case 'star':
+                    if(typeof data.max === "number" && typeof data.min === "number"){
+                        var span = document.createElement('span'),
+                            i = 0,
+                            inputEls = [];
+                        span.setAttribute('class', 'rating-widget');
+                        el.appendChild(span);
+                        for (i = data.min; i <= data.max; i++) {
+                            var label = document.createElement('label');
+                            label.setAttribute('class', 'star-grey');
+                            function doActionWithSiblings(actionPrev, actionNext) {
+                                var sibbling = this;
+                                while (sibbling) {
+                                    actionPrev.apply(this, [sibbling]);
+                                    sibbling = sibbling.previousSibling;
+                                }
+                                sibbling = this;
+                                sibbling = sibbling.nextSibling;
+                                while (sibbling) {
+                                    actionNext.apply(this, [sibbling]);
+                                    sibbling = sibbling.nextSibling;
+                                }
+                            }
+                            label.onmouseover = function () {
+                                doActionWithSiblings.apply(this, [function (sibbling) {
+                                    sibbling.className = 'star-orange';
+                                },
+                                function (sibbling) {
+                                    sibbling.className = 'star-grey';
+                                }]);
+                            };
+                            label.onclick = function () {
+                                doActionWithSiblings.apply(this, [function (sibbling) {
+                                    sibbling.className = 'star-orange';
+                                    sibbling.onmouseover = null;
+                                },
+                                function (sibbling) {
+                                    sibbling.className = 'star-grey';
+                                    sibbling.onmouseover = null;
+                                }]);
+                            };
+                            var inputEl = document.createElement('input');
+                            inputEl.setAttribute('name', 'star');
+                            inputEl.className = 'star';
+                            inputEl.setAttribute('type', 'radio');
+                            inputEl.setAttribute('value', i);
+                            inputEls.push(inputEl);
+                            if (typeof data.formEl === "undefined") {
+                                data.rating = inputEl.value;
+                                this.rating(data, inputEl);
+                            }
+                            label.appendChild(inputEl);
+                            span.appendChild(label);
+                        }
+                        if (typeof data.formEl !== "undefined" && data.formEl) {
+                            data.ratingEl = inputEls;
+                            var formEl = data.formEl;
+                            delete data.formEl;
+                            this.rating(data, formEl);
+                        }
+                    } else {
+                        console.log('min and max not given');
+                    }
+                    break;
                 }
             }
         };
         window.sugestio = S;
-        //displays the rating widget in the DOM element
-        function displayRatingWidget(el, data) {
-			var itemid = data.itemid, 
-			    type = data.type;
-            switch (type) {
-            case 'star':
-				if(typeof data.max === "number" && typeof data.min === "number"){
-					var span = document.createElement('span'),
-						i = 0,
-						inputEls = [];
-					span.setAttribute('class', 'rating-widget');
-					el.appendChild(span);
-					for (i = data.min; i <= data.max; i++) {
-						var label = document.createElement('label');
-						label.setAttribute('class', 'star-grey');
-						function doActionWithSiblings(actionPrev, actionNext) {
-							var sibbling = this;
-							while (sibbling) {
-								actionPrev.apply(this, [sibbling]);
-								sibbling = sibbling.previousSibling;
-							}
-							sibbling = this;
-							sibbling = sibbling.nextSibling;
-							while (sibbling) {
-								actionNext.apply(this, [sibbling]);
-								sibbling = sibbling.nextSibling;
-							}
-						}
-						label.onmouseover = function () {
-							doActionWithSiblings.apply(this, [function (sibbling) {
-								sibbling.className = 'star-orange';
-							},
-							function (sibbling) {
-								sibbling.className = 'star-grey';
-							}]);
-						};
-						label.onclick = function () {
-							doActionWithSiblings.apply(this, [function (sibbling) {
-								sibbling.className = 'star-orange';
-								sibbling.onmouseover = null;
-							},
-							function (sibbling) {
-								sibbling.className = 'star-grey';
-								sibbling.onmouseover = null;
-							}]);
-						};
-						var inputEl = document.createElement('input');
-						inputEl.setAttribute('name', 'star');
-						inputEl.className = 'star';
-						inputEl.setAttribute('type', 'radio');
-						inputEl.setAttribute('value', i);
-						inputEls.push(inputEl);
-						if (typeof data.formEl === "undefined") {
-							this.rating({'itemid': itemid, detail: 'STAR:'+data.max+':'+data.min+':' + inputEl.value}, inputEl);
-						}
-						label.appendChild(inputEl);
-						span.appendChild(label);
-					}
-					if (typeof data.formEl !== "undefined" && data.formEl) {
-						this.rating({
-							'itemid': itemid,
-							ratingEl: inputEls,
-							max: data.max,
-							min: data.min
-						}, data.formEl);
-					}
-				} else {
-					console.log('min and max not given');
-				}
-                break;
-            }
-        }
+        
         var uuid = 0, remoteCallbacks = {};
         //easyXDM remote call: see documentation
         function remoteCall(method, params, callbacks) {
@@ -458,7 +492,7 @@ function addScript(src, onload) {
     }
     head.appendChild(script);
 }
-//sizzle for getting DOM Elements described by a CSS selector
-addScript('SugestioJS/sizzle.js');
+// for getting DOM Elements described by a CSS selector
 //easyXDM for cross domain messaging
+addScript("https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js");
 addScript('SugestioJS/easyXDM/easyXDM.js', scriptsLoaded);

@@ -29,7 +29,7 @@
  * THE SOFTWARE.
  */
 
-require 'oauth-php/example/server/core/init.php';
+require '/oauth-php/example/server/core/init.php';
 
 $smarty = session_smarty();
 $smarty->display('index.tpl');

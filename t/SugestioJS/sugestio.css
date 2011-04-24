@@ -1,0 +1,22 @@
+@charset "utf-8";
+/* CSS Document */
+.rating-widget label.star-grey{
+	background-image:url(images/star-grey.png);
+}
+.rating-widget label.star-orange{
+	background-image:url(images/star-orange.png);
+}
+.rating-widget input{
+	display: none;
+}
+.rating-widget label{
+	float: left;
+	width: 20px;
+	height: 20px;
+	background-repeat: no-repeat;
+}
+.rating-widget{
+	float: none;
+	margin-right: 5px;
+	margin-bottom: 5px;
+}

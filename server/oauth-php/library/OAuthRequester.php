@@ -3,7 +3,7 @@
 /**
  * Perform a signed OAuth request with a GET, POST, PUT or DELETE operation.
  * 
- * @version $Id: OAuthRequester.php 174 2010-11-24 15:15:41Z brunobg@corollarium.com $
+ * @version $Id: OAuthRequester.php 134 2010-06-22 17:00:32Z brunobg@corollarium.com $
  * @author Marc Worrell <marcw@pobox.com>
  * @date  Nov 20, 2007 1:41:38 PM
  * 
@@ -61,6 +61,9 @@ class OAuthRequester extends OAuthRequestSigner
 	function __construct ( $request, $method = null, $params = null, $body = null, $files = null )
 	{
 		parent::__construct($request, $method, $params, $body);
+		echo "request = ".$request;
+		echo "method = ".$method;
+		print_r($params);
 
 		// When there are files, then we can construct a POST with a single file
 		if (!empty($files))
@@ -109,13 +112,17 @@ class OAuthRequester extends OAuthRequestSigner
 			$this->setBody($body);
 			$curl_options = $this->prepareCurlOptions($curl_options, $extra_headers);
 		}
+		
 		$this->sign($usr_id, null, $name);
 		$text   = $this->curl_raw($curl_options);
-		$result = $this->curl_parse($text);	
-		if ($result['code'] >= 400)
-		{
-			throw new OAuthException2('Request failed with code ' . $result['code'] . ': ' . $result['body']);
-		}
+		//$result = $this->curl_parse($text);
+		// Modified behaviour: SugestioClient.php should always receive the $result array
+		// Response codes such as 404 may occur as part of the normal web service usage
+		// and need to be forwarded to the Sugestio client
+		//if ($result['code'] >= 400)
+		//{
+		//	throw new OAuthException2('Request failed with code ' . $result['code'] . ': ' . $result['body']);
+		//}
 
 		// Record the token time to live for this server access token, immediate delete iff ttl <= 0
 		// Only done on a succesful request.	
@@ -156,7 +163,7 @@ class OAuthRequester extends OAuthRequestSigner
 		$uri 	= $r['request_token_uri'];
 
 		$oauth 	= new OAuthRequester($uri, $method, $params);
-		$oauth->sign($usr_id, $r, '', 'requestToken');
+		$oauth->sign($usr_id, $r);
 		$text	= $oauth->curl_raw($curl_options);
 
 		if (empty($text))
@@ -245,17 +252,17 @@ class OAuthRequester extends OAuthRequestSigner
 
 		OAuthRequestLogger::setRequestObject($oauth);
 
-		$oauth->sign($usr_id, $r, '', 'accessToken');
+		$oauth->sign($usr_id, $r);
 		$text	= $oauth->curl_raw($curl_options);
 		if (empty($text))
 		{
-			throw new OAuthException2('No answer from the server "'.$uri.'" while requesting an access token');
+			throw new OAuthException2('No answer from the server "'.$uri.'" while requesting a request token');
 		}
 		$data	= $oauth->curl_parse($text);
 
 		if ($data['code'] != 200)
 		{
-			throw new OAuthException2('Unexpected result from the server "'.$uri.'" ('.$data['code'].') while requesting an access token');
+			throw new OAuthException2('Unexpected result from the server "'.$uri.'" ('.$data['code'].') while requesting a request token');
 		}
 
 		$token  = array();
@@ -395,9 +402,8 @@ class OAuthRequester extends OAuthRequestSigner
 				}
 			}
 		}
-
 		curl_setopt($ch, CURLOPT_HTTPHEADER,	 $header);
-		curl_setopt($ch, CURLOPT_USERAGENT,		 'anyMeta/OAuth 1.0 - ($LastChangedRevision: 174 $)');
+		curl_setopt($ch, CURLOPT_USERAGENT,		 'anyMeta/OAuth 1.0 - ($LastChangedRevision: 134 $)');
 		curl_setopt($ch, CURLOPT_URL, 			 $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HEADER, 		 true);
@@ -410,8 +416,9 @@ class OAuthRequester extends OAuthRequestSigner
 				curl_setopt($ch, $k, $v);
 			}
 		}
+		var_dump($ch);
 
-		$txt = curl_exec($ch);
+		/*$txt = curl_exec($ch);
 		if ($txt === false) {
 			$error = curl_error($ch);
 			curl_close($ch);
@@ -436,9 +443,9 @@ class OAuthRequester extends OAuthRequestSigner
 		}
 
 		OAuthRequestLogger::setSent($data, $body);
-		OAuthRequestLogger::setReceived($txt);
+		OAuthRequestLogger::setReceived($txt);*/
 
-		return $txt;
+		//return $txt;
 	}
 	
 	

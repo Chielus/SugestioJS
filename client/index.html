@@ -12,6 +12,7 @@ p.recommendation{
     margin: 0px;
 }
 </style>
+<script type="text/javascript" src="sizzle.js"></script>
 <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
 <script type="text/javascript">
 	//sugestio.user.login(2);
@@ -34,7 +35,6 @@ p.recommendation{
 	}
 	
 	function parseSimilar(resp){
-	    console.log(resp);
 	    var container = document.getElementById('similar');
         for(var j=0;j<resp.length;j++){
             var p = document.createElement('p');
@@ -47,11 +47,11 @@ p.recommendation{
 	loggedIn.recommendations(parseRecommendations,this);
 	loggedIn.similar(parseSimilar,this);
 </script>
-<button type="button" class="view">View item 1</button>
+<button type="button" id="view1" class="view">View item 1</button>
 <script type="text/javascript">
 	sugestio.user(3).view({
 		itemid: 1
-	},'button.view');
+	},Sizzle("button#view1"));
 </script>
 
 <form id="formUser" method="post" onsubmit="return false;">
@@ -59,8 +59,8 @@ p.recommendation{
 <label>Username: </label><input type="text" name="username" value="" /><br />
 <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
 <script type="text/javascript">
-	sugestio.user.meta({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
-	sugestio.user(2).meta({gender: 'F'});
+	sugestio.user.meta({idEl: Sizzle('input[name="username"]'), genderEl: Sizzle('input[name="gender"]')},document.getElementById('formUser'));
+	//sugestio.user(2).meta({gender: 'F'});
 </script>
 <input type="submit" value="Subscribe" />
 <br />

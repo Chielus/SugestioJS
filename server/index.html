@@ -9,21 +9,15 @@
     /**
      * Request the use of the JSON object
      */
-    easyXDM.DomHelper.requiresJSON("json2.js");
+    easyXDM.DomHelper.requiresJSON("easyXDM/json2.js");
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 <script type="text/javascript">
-    document.domain = 'api.sugestio.com';
-    var remoteURL = "http://sugestio.client";
     var socket = new easyXDM.Socket({
         local: "index.html",
-        remote: remoteURL + "/index.html",
-        onReady: function(){
-            //if we want to do something when the socket is read
-        },
         onMessage: function(message,origin){
-            console.log("Server received a message from "+origin);
-            console.log(message);
+            //console.log("Server received a message from "+origin);
+            //console.log(message);
             var request = JSON.parse(message);
             var method = request.method,
                 params = request.params,
@@ -33,13 +27,13 @@
         }
     });
     var publicMethods = {
-        get: function(url,id){
+        get: function(url, xauth, auth, id){
             $.ajax({
               type: 'GET',
               'url': url,
               'data': [],
               success: function(resp){
-                      sendResponse({
+                    sendResponse({
                         id: id,
                         result: resp
                     });
@@ -47,35 +41,43 @@
               error: function(jqXHR,textStatus,errorThrown){
                       sendResponse({
                         id: id,
-                        message: errorThrown
+                        message: errorThrown ? errorThrown : jqXHR.responseText
                     });
+              },
+              beforeSend: function (xhr) {
+                  xhr.setRequestHeader ('Authorization', auth);
+                  xhr.setRequestHeader ('X-Sugestio-oauth-hash', xauth);
               },
               dataType: 'json'
             });
         },
-        post: function(url, data, id){
+        post: function(url, xauth, auth, data, id){
             $.ajax({
               type: 'POST',
               'url': url,
               'data': data,
               success: function(resp){
-                      sendResponse({
+                    sendResponse({
                         id: id,
                         result: resp
                     });
               },
               error: function(jqXHR,textStatus,errorThrown){
-                      sendResponse({
+                    sendResponse({
                         id: id,
-                        message: errorThrown
+                        message: errorThrown ? errorThrown : jqXHR.responseText
                     });
+              },
+              beforeSend: function (xhr) {
+                  xhr.setRequestHeader ('Authorization', auth);
+                  xhr.setRequestHeader ('X-Sugestio-oauth-hash', xauth);
               },
               dataType: 'json'
             });
         }
     }
     function sendResponse(response){
-        console.log('sending response');
+        //console.log('sending response');
         socket.postMessage(JSON.stringify(response),'*');
     }
 </script>

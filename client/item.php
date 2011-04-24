@@ -15,6 +15,7 @@ p.recommendation{
     margin: 0px;
 }
 </style>
+<script type="text/javascript" src="sizzle.js"></script>
 <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
 <script type="text/javascript">
     function getCookie(c_name) {
@@ -33,7 +34,7 @@ p.recommendation{
     }
     var loggedIn = sugestio.user(getUser,this);
     var item = sugestio.item(<?php echo $_GET['id']; ?>); //GET variabele kan eventueel ook met JavaScript opgehaald worden, POST uiteraard niet
-    console.log(item.id);
+    //console.log(item.id);
 </script>
 </head>
 <body>
@@ -55,17 +56,22 @@ p.recommendation{
 	item.similar(parseSimilar,this);
 </script>
 <script type="text/javascript">
-	loggedIn.view({
+	/*loggedIn.view({
 		itemid: item.id 
-	});
+	});*/
 </script>
 <label>Rating1</label>
 <div class="rating">
 </div><br />
+<div class="rating2">
+</div><br />
 <form id="form1" method="post" onsubmit="return false;"><div class="rating-form"><label>Rating2 in form: </label>
 <script type="text/javascript">
-    loggedIn.ratingWidget({type: 'star', itemid: item.id, contentEl: 'div.rating', min: 0, max: 9});
-	loggedIn.ratingWidget({type: 'star', itemid: item.id, contentEl: 'div.rating-form', formEl: '#form1', min: 1, max: 5});
+    sugestio.ratingWidget({type: 'star', itemid: item.id, userid: loggedIn.id, contentEl: Sizzle('div.rating'), min: 0, max: 9});
+    //sugestio.ratingWidget({type: 'star', itemid: item.id, contentEl: Sizzle('div.rating2'), min: 2, max: 7, userid: 'tester'});
+	sugestio.ratingWidget({type: 'star', itemid: item.id, userid: 'tester', contentEl: Sizzle('div.rating-form'), formEl: Sizzle('#form1'), min: 1, max: 5});
+    /*var el = document.getElementById('form1');
+    console.log(el.nodeName);*/
 </script>
 <input type="submit" value="Rate!" />
 </div>

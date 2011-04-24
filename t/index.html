@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Client website</title>
+<link rel="stylesheet" type="text/css" href="SugestioJS/sugestio.css" />
+<style type="text/css">
+label{
+	float: left;	
+}
+p.recommendation{
+    margin: 0px;
+}
+</style>
+<script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+<script type="text/javascript">
+	//sugestio.user.login(2);
+</script>
+</head>
+<body>
+<h1>Client website on sugestio.client</h1>
+<div id='recommendations'><p><strong>Recommendations:</strong></p></div>
+<div id='similar'><p><strong>Similar users:</strong></p></div>
+<script type="text/javascript">
+	//resp is a JSON array. Elements is not obligatory
+	function parseRecommendations(resp){
+	    var container = document.getElementById('recommendations');
+		for(var j=0;j<resp.length;j++){
+			var p = document.createElement('p');
+			p.className = "recommendation";
+			p.innerHTML = resp[j].itemid;
+			container.appendChild(p);
+		}
+	}
+	
+	function parseSimilar(resp){
+	    console.log(resp);
+	    var container = document.getElementById('similar');
+        for(var j=0;j<resp.length;j++){
+            var p = document.createElement('p');
+            p.className = "recommendation";
+            p.innerHTML = resp[j].userid;
+            container.appendChild(p);
+        }
+    }
+	var loggedIn = sugestio.user(1);
+	loggedIn.recommendations(parseRecommendations,this);
+	loggedIn.similar(parseSimilar,this);
+</script>
+<button type="button" class="view">View item 1</button>
+<script type="text/javascript">
+	sugestio.user(3).view({
+		itemid: 1
+	},'button.view');
+</script>
+
+<form id="formUser" method="post" onsubmit="return false;">
+<div class="rating-form">
+<label>Username: </label><input type="text" name="username" value="" /><br />
+<label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
+<script type="text/javascript">
+	sugestio.user.meta({idEl: 'input[name="username"]', genderEl: 'input[name="gender"]'},'#formUser');
+	sugestio.user(2).meta({gender: 'F'});
+</script>
+<input type="submit" value="Subscribe" />
+<br />
+<a href="item.php?id=2">Go to item 2</a>
+</div>
+</form>
+</body>
+</html>
