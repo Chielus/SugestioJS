@@ -47,14 +47,14 @@ TODO: uitleg rond OAuth
 
 # Quick start
 
-<script type="text/javascript">
-    var options = {
-        secured: false,
-        account: 'sandbox',
-        baseURL: 'http://js.sugestio.com'
-    }
-    sugestioInit(options);
-</script>
+	<script type="text/javascript">
+	    var options = {
+		secured: false,
+		account: 'sandbox',
+		baseURL: 'http://js.sugestio.com'
+	    }
+	    sugestioInit(options);
+	</script>
 
 # Tutorial and sample code
 
