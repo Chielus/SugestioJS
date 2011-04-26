@@ -1,9 +1,7 @@
 # Overview
 
-This is a PHP library for interfacing with the [Sugestio](http://www.sugestio.com) 
-recommendation service. Data is submitted as JSON data. The library uses 
-[oauth-php](http://code.google.com/p/oauth-php/) to create the OAuth-signed requests. 
-Our Drupal and Magento modules are built on top of this generic library.
+This is a JavaScript library for interfacing with the [Sugestio](http://www.sugestio.com) 
+recommendation service. Sugestio also has [server-side libraries](http://www.sugestio.com/libraries).
 
 ## About Sugestio
 
@@ -25,7 +23,7 @@ with the service. The Sandbox can give personal recommendations for users 1 thro
 and similar items for items 1 through 5.
 
 When you are ready to work with real data, you may apply for a developer account through 
-the [Sugestio website](http://www.sugestio.com).  
+the [Sugestio website](http://www.sugestio.com).
 
 ## About this library
 
@@ -36,87 +34,34 @@ The following [API](http://www.sugestio.com/documentation) features are implemen
 * get personalized recommendations for a given user
 * get items that are similar to a given item
 * get users that are similar to a given user
-* (bulk) submit user activity (consumptions): clicks, purchases, ratings, ...
-* (bulk) submit item metadata: description, location, tags, categories, ...  	
-* (bulk) submit user metadata: gender, location, birthday, ...
-* delete consumptions
+* submit user activity (consumptions): clicks, purchases, ratings, ...
+* submit item metadata: description, location, tags, categories, ...  	
+* submit user metadata: gender, location, birthday, ...
+* TODO: delete consumptions
 * delete item metadata
 * delete user metadata
-* get performance data (analytics): precision, recall, ...
 
 ### Requirements
 
-[oauth-php](http://code.google.com/p/oauth-php/) uses cURL for communicating 
-with the recommendation service. As such, your system needs to have a current 
-version of cURL installed. In addition, your PHP installation must include the 
-php-curl extension and JSON support.
-
-This distribution includes a slightly modified copy of 
-[oauth-php](http://code.google.com/p/oauth-php/):
-
-* OAuthRequester::doRequest does not throw an OAuthException2 on response codes >= 400
-* Workaround for [Issue #66](http://code.google.com/p/oauth-php/issues/detail?id=66)
+TODO: uitleg rond OAuth
 
 # Quick start
 
-	require_once dirname(__FILE__) . '/SugestioClient.php';
-	require_once dirname(__FILE__) . '/SugestioUser.php';
-	require_once dirname(__FILE__) . '/SugestioItem.php';
-	require_once dirname(__FILE__) . '/SugestioConsumption.php';
-	
-	$client = new SugestioClient('sandbox', 'demo');
-	
-	// user X has consumed item Y
-	$consumption = new SugestioConsumption('X', 'Y'); // userid, itemid
-	$client->addConsumption($consumption);
-	
-	// submit consumptions in bulk
-	$consumption1 = new SugestioConsumption('X', 'Y');
-	$consumption2 = new SugestioConsumption('X', 'Z');
-	$consumptions = array($consumption1, $consumption2);	
-	$client->addConsumptions($consumptions);
-	
-	// delete all consumptions made by user X
-	$client->deleteUserConsumptions('X');
-	
-	// submit item metadata for item with ID Y
-	$item = new SugestioItem('Y');
-	$item->title = 'Item Y';
-	$item->category = array('A', 'B');
-	$client->addItem($item);
-	
-	// get recommendations for user 1
-	$recommendations = $client->getRecommendations(1);
-	
-	// two best recommendations for user 1
-	$recommendations = $client->getRecommendations(1, array('limit'=>2));
-	
-	// only recommendations from category 'music'
-	$recommendations = $client->getRecommendations(1, array('category'=>'music'));	
-	
-	// only recommendations within 1 mile of this location
-	$queryParams = array(
-		'location_latlong'=>'40.688889,-74.045111',
-		'location_radius'=>'1',
-		'location_unit'=>'mi');	
-	$recommendations = $client->getRecommendations(1, $queryParams);
-	
-	// combined filter
-	$queryParams = array(
-		'limit'=>5, // best five
-		'category'=>'A,!B,C' // from category A or C, but not B
-		'location_latlong'=>'40.688889,-74.045111',
-		'location_radius'=>'1',
-		'location_unit'=>'mi');	
-	$recommendations = $client->getRecommendations(1, $queryParams);
+<script type="text/javascript">
+    var options = {
+        secured: false,
+        account: 'sandbox',
+        baseURL: 'http://js.sugestio.com'
+    }
+    sugestioInit(options);
+</script>
 
 # Tutorial and sample code
 
-<code>Tutorial.php</code> contains sample code that illustrates how you can use the library. 
+<code>Tutorial.html</code> contains sample code that illustrates how you can use the library. 
 You can uncomment the function that you want to try out. The rest of this section shows you 
 how to use the <code>SugestioClient</code> object's public methods and what kind of response
-to expect from the service. There are also some pointers on how to integrate the library into
-an existing e-commerce application.
+to expect from the service.
 
 ## Configuration
 

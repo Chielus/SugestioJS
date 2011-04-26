@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Demo website</title>
+<title>SugestioJS Tutorial</title>
 <link rel="stylesheet" type="text/css" href="SugestioJS/sugestio.css" />
 <style type="text/css">
 label{
@@ -14,9 +14,35 @@ p.recommendation{
 </style>
 <script type="text/javascript" src="sizzle.js"></script>
 <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+<script type="text/javascript">
+    function htmlEntities(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    var options = {
+        secured: false,
+        account: 'sandbox',
+        //signerURL: 'http://jsdemo.sugestio.com/demo/signer.php',
+        baseURL: 'http://js.sugestio.com'
+    }
+    sugestioInit(options);
+</script>
 </head>
 <body>
-
+<h1>SugestioJS Tutorial</h1>
+<h2>Initialization</h2>
+<p>To init SugestioJS you have to pass some options. This can be done by calling the global function sugestioInit</p>
+<pre>
+    <code>
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        var options = {
+            secured: false,
+            account: &#x27;sandbox&#x27;,
+            baseURL: &#x27;http://js.sugestio.com&#x27;
+        }
+        sugestioInit(options);
+    &lt;/script&gt;
+    </code>
+</pre>
 <!-- demo -->
 <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
 <div id='similar'><p><strong>Similar users:</strong></p></div>
@@ -63,11 +89,13 @@ p.recommendation{
 <br />
 </div>
 </form>
+<br />
 <form id="form2" method="post" onsubmit="return false;">
     <label>Username2: </label><input type="text" name="username2" value="" /><br />
-    <input type="submit" value="Subscribe" />
+    <input type="submit" value="View item with this username" />
 </form>
 <script type="text/javascript">
+    sugestio.user(3).del();
     sugestio.view({
         itemid: 'testitem',
         useridEl: Sizzle('input[name="username2"]')
