@@ -60,6 +60,7 @@ First include the SugestioJS script. Then you have to pass some options by calli
 	</script>
 
 Now you can use the global variable sugestio to submit resources or get recommendations
+
 	<script type="text/javascript">
 	    // submit user metadata for user with ID 1
 	    sugestio.user(1).meta({gender: 'M', birthday: '1967-02-17'});

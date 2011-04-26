@@ -29,47 +29,75 @@ p.recommendation{
 </head>
 <body>
 <h1>SugestioJS Tutorial</h1>
-<h2>Initialization</h2>
+<h2><a name=initialization></a>Initialization</h2>
 <p>To init SugestioJS you have to pass some options. This can be done by calling the global function sugestioInit</p>
 <pre>
     <code>
-        <script type="text/javascript">
-            var options = {
-                secured: false,
-                account: 'sandbox',
-                baseURL: 'http://js.sugestio.com'
-            }
-            sugestioInit(options);
-        </script>
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        var options = {
+            secured: false,
+            account: &#x27;sandbox&#x27;,
+            baseURL: &#x27;http://js.sugestio.com&#x27;
+        }
+        sugestioInit(options);
+    &lt;/script&gt;
     </code>
 </pre>
-<!-- demo -->
-<div id='recommendations'><p><strong>Recommendations:</strong></p></div>
-<div id='similar'><p><strong>Similar users:</strong></p></div>
-<script type="text/javascript">
-	//resp is a JSON array. Elements is not obligatory
-	function parseRecommendations(resp){
-	    var container = document.getElementById('recommendations');
-		for(var j=0;j<resp.length;j++){
-			var p = document.createElement('p');
-			p.className = "recommendation";
-			p.innerHTML = resp[j].itemid;
-			container.appendChild(p);
-		}
-	}
-	function parseSimilar(resp){
-	    var container = document.getElementById('similar');
-        for(var j=0;j<resp.length;j++){
-            var p = document.createElement('p');
-            p.className = "recommendation";
-            p.innerHTML = resp[j].userid;
-            container.appendChild(p);
+<h2><a name=submit_data></a>Submitting resources</h2>
+<p>Now you can use the global variable sugestio to submit resources or get recommendations</p>
+<pre><code>
+    // submit user metadata for user with ID 1
+    sugestio.user(1).meta({gender: &#x27;M&#x27;, birthday: &#x27;1967-02-17&#x27;});
+
+    // submit item metadata for item with ID 2
+    var item = sugestio.item(2);
+    item.meta({title: &#x27;Item 2&#x27;, category: [&#x27;A&#x27;, &#x27;B&#x27;]});
+
+    // delete previous item metadata
+    item.del();
+
+    // user 1 has viewed item 2
+    sugestio.user(1).view({itemid: 2});
+    
+    // user 1 has rated item 2 with score 4/5
+    sugestio.user(1).rating({itemid: 2, min: 0, max: 5, rating: 4});
+    // the following calls are equivalent
+    sugestio.user(1).rating({itemid: 2, detail: &#x27;STAR:0:5:4&#x27;});
+    sugestio.rating({itemid: 2, userid: 1, detail: &#x27;STAR:0:5:4&#x27;});
+</code></pre>
+<h2><a name=recommendations></a>Getting recommendations</h2>
+<pre><code>
+    &lt;div id=&#x27;recommendations&#x27;&gt;&lt;p&gt;&lt;strong&gt;Recommendations:&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        //resp is an array of object literals. Elements is not obligatory
+        function parseRecommendations(resp){
+            var container = document.getElementById(&#x27;recommendations&#x27;);
+            for(var j=0;j&lt;resp.length;j++){
+                var p = document.createElement(&#x27;p&#x27;);
+                p.className = &quot;recommendation&quot;;
+                p.innerHTML = resp[j].itemid;
+                container.appendChild(p);
+            }
         }
-    }
-	var loggedIn = sugestio.user(1);
-	loggedIn.recommendations(parseRecommendations,this);
-	loggedIn.similar(parseSimilar,this);
-</script>
+        var loggedIn = sugestio.user(1);
+        loggedIn.recommendations(parseRecommendations,this);
+    &lt;/script&gt;
+    
+    &lt;div id=&#x27;similar&#x27;&gt;&lt;p&gt;&lt;strong&gt;Similar users:&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        function parseSimilar(resp){
+            var container = document.getElementById(&#x27;similar&#x27;);
+        //iterate over the response array
+            for(var j=0;j&lt;resp.length;j++){
+                var p = document.createElement(&#x27;p&#x27;);
+                p.className = &quot;recommendation&quot;;
+                p.innerHTML = resp[j].userid;
+                container.appendChild(p);
+            }
+        }
+        loggedIn.similar(parseSimilar,this);
+    &lt;/script&gt;
+</code></pre>
 <button type="button" id="view1" class="view">View item 1</button>
 <script type="text/javascript">
 	sugestio.user(3).view({
@@ -83,7 +111,6 @@ p.recommendation{
 <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
 <script type="text/javascript">
 	sugestio.user.meta({idEl: Sizzle('input[name="username"]'), genderEl: Sizzle('input[name="gender"]')},document.getElementById('formUser'));
-	//sugestio.user(2).meta({gender: 'F'});
 </script>
 <input type="submit" value="Subscribe" />
 <br />
