@@ -27,50 +27,54 @@
         }
     });
     var publicMethods = {
-        get: function(url, xauth, auth, id){
+        get: function(url, opts, id){
             $.ajax({
               type: 'GET',
               'url': url,
-              'data': [],
+              'data': opts.data ? opts.data : [],
               success: function(resp){
-                    sendResponse({
-                        id: id,
-                        result: resp
-                    });
+                  sendResponse({
+                      id: id,
+                      result: resp
+                  });
               },
               error: function(jqXHR,textStatus,errorThrown){
-                      sendResponse({
-                        id: id,
-                        message: errorThrown ? errorThrown : jqXHR.responseText
-                    });
+                  sendResponse({
+                      id: id,
+                      message: errorThrown ? errorThrown : jqXHR.responseText
+                  });
               },
               beforeSend: function (xhr) {
-                  xhr.setRequestHeader ('Authorization', auth);
-                  xhr.setRequestHeader ('X-Sugestio-oauth-hash', xauth);
+                  if(opts.auth && opts.xauth){
+                      xhr.setRequestHeader ('Authorization', opts.auth);
+                      xhr.setRequestHeader ('X-Sugestio-oauth-hash', opts.xauth);
+                  }
               },
               dataType: 'json'
             });
         },
-        post: function(url, xauth, auth, data, id){
+        post: function(url, opts, id){
             $.ajax({
               type: 'POST',
               'url': url,
-              'data': data,
+              'data': opts.data ? opts.data : [],
               success: function(resp){
-                    sendResponse({
-                        id: id,
-                        result: resp
-                    });
+                  sendResponse({
+                      id: id,
+                      result: resp
+                  });
               },
               error: function(jqXHR,textStatus,errorThrown){
-                    sendResponse({
-                        id: id,
-                        message: errorThrown ? errorThrown : jqXHR.responseText
-                    });
+                  sendResponse({
+                      id: id,
+                      message: errorThrown ? errorThrown : jqXHR.responseText
+                  });
               },
               beforeSend: function (xhr) {
-                  xhr.setRequestHeader ('Authorization', auth);
-                  xhr.setRequestHeader ('X-Sugestio-oauth-hash', xauth);
+                  if(opts.auth && opts.xauth){
+                      xhr.setRequestHeader ('Authorization', opts.auth);
+                      xhr.setRequestHeader ('X-Sugestio-oauth-hash', opts.xauth);
+                  }
               },
               dataType: 'json'
             });

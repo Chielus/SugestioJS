@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Client website</title>
+<title>Demo website</title>
 <link rel="stylesheet" type="text/css" href="SugestioJS/sugestio.css" />
 <style type="text/css">
 label{
@@ -14,12 +14,10 @@ p.recommendation{
 </style>
 <script type="text/javascript" src="sizzle.js"></script>
 <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
-<script type="text/javascript">
-	//sugestio.user.login(2);
-</script>
 </head>
 <body>
-<h1>Client website on sugestio.client</h1>
+
+<!-- demo -->
 <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
 <div id='similar'><p><strong>Similar users:</strong></p></div>
 <script type="text/javascript">
@@ -33,7 +31,6 @@ p.recommendation{
 			container.appendChild(p);
 		}
 	}
-	
 	function parseSimilar(resp){
 	    var container = document.getElementById('similar');
         for(var j=0;j<resp.length;j++){
@@ -64,8 +61,18 @@ p.recommendation{
 </script>
 <input type="submit" value="Subscribe" />
 <br />
-<a href="item.php?id=2">Go to item 2</a>
 </div>
 </form>
+<form id="form2" method="post" onsubmit="return false;">
+    <label>Username2: </label><input type="text" name="username2" value="" /><br />
+    <input type="submit" value="Subscribe" />
+</form>
+<script type="text/javascript">
+    sugestio.view({
+        itemid: 'testitem',
+        useridEl: Sizzle('input[name="username2"]')
+    },Sizzle('#form2'));
+</script>
+<a href="item.php?id=2">Go to item 2</a>
 </body>
 </html>
