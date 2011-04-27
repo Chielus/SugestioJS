@@ -10,7 +10,6 @@ setCookie("userid","tester"); //bij login
 define("CONSUMER_KEY", "magento"); //FILL THIS
 define("CONSUMER_SECRET", "pEG2aihBdV"); //FILL THIS
 
-
 //  Init the OAuthStore
 $options = array(
     'consumer_key' => CONSUMER_KEY, 
@@ -41,7 +40,7 @@ $req = new OAuthRequester($request, $method, $params);
 $req->sign(0,null,'');
 $header = $req->getAuthorizationHeader();
 
-$str = "consumer_key=".$consumer_key."&consumer_secret=".$consumer_secret."&ip=".$ip."&userid=".$userid;
+$str = "consumer_secret=".$consumer_secret."&oauth_nonce=".$req->getParam('oauth_nonce')."&userid=".$userid."&client_ip=".$ip;
 
 $doc = new DOMDocument();
 $doc->formatOutput = true;

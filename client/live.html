@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SugestioJS Live Tutorial</title>
+<link rel="stylesheet" type="text/css" href="SugestioJS/sugestio.css" />
+<style type="text/css">
+label{
+	float: left;	
+}
+p.recommendation{
+    margin: 0px;
+}
+</style>
+<script type="text/javascript" src="sizzle.js"></script>
+<script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+</head>
+<body>
+<h1>SugestioJS Live Tutorial</h1>
+<h2><a name=initialization></a>Initialization</h2>
+<p>To init SugestioJS you have to pass some options. This can be done by calling the global function sugestioInit</p>
+
+    <script type="text/javascript">
+        var options = {
+            secured: true,
+            account: 'magento',
+            signerURL: 'http://jsdemo.sugestio.com/demo/signer.php',
+            baseURL: 'http://js.sugestio.com'
+        }
+        sugestioInit(options);
+    </script>
+
+<h2><a name=submit_data></a>Submitting resources</h2>
+<p>Now you can use the global variable sugestio to submit resources or get recommendations</p>
+<script type="text/javascript">
+    // submit user metadata for user with ID 1
+    sugestio.user(1).meta({gender: 'M', birthday: '1967-02-17'});
+
+    // submit item metadata for item with ID 2
+    var item = sugestio.item(2);
+    item.meta({title: 'Item 2', category: ['A', 'B']});
+
+    // delete previous item metadata
+    item.del();
+
+    // user 1 has viewed item 2
+    sugestio.user(1).view({itemid: 2});
+    
+    // user 1 has rated item 2 with score 4/5
+    sugestio.user(1).rating({itemid: 2, min: 0, max: 5, rating: 4});
+    // the following calls are equivalent
+    sugestio.user(1).rating({itemid: 2, detail: 'STAR:0:5:4'});
+    sugestio.rating({itemid: 2, userid: 1, detail: 'STAR:0:5:4'});
+</script>
+<p>For submitting data or consumptions to Sugestio you can also listen to events of the DOM. Just pass the DOM element(s) as the second parameter</p>
+
+    <button type="button" id="view1" class="view">View item 1</button>
+    <script type="text/javascript">
+        sugestio.user(3).view({
+            itemid: 1
+        },document.getElementById("view1"));
+    </script>
+
+<p>In case you want to bind a Sugestio call to a form, you have to command SugestioJS to get the values from the corresponding DOM elements:</p>
+
+    <form id="formUser" method="post" onsubmit="return false;">
+        <div class="rating-form">
+            <label>Username: </label><input type="text" name="username" value="" /><br />
+            <label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
+            <script type="text/javascript">
+                sugestio.user.meta({idEl: document.getElementsByName('username'), genderEl: document.getElementsByName('gender')},document.getElementById('formUser'));
+            </script>
+            <input type="submit" value="Subscribe" />
+            <br />
+        </div>
+    </form>
+
+<h2><a name=recommendations></a>Getting recommendations</h2>
+
+    <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
+    <script type="text/javascript">
+        //resp is an array of object literals. Elements is not obligatory
+        function parseRecommendations(resp){
+            var container = document.getElementById('recommendations');
+            for(var j=0;j<resp.length;j++){
+                var p = document.createElement('p');
+                p.className = "recommendation";
+                p.innerHTML = resp[j].itemid;
+                container.appendChild(p);
+            }
+        }
+        var loggedIn = sugestio.user(1);
+        loggedIn.recommendations(parseRecommendations,this);
+    </script>
+    
+    <div id='similar'><p><strong>Similar users:</strong></p></div>
+    <script type="text/javascript">
+        function parseSimilar(resp){
+            var container = document.getElementById('similar');
+            //iterate over the response array
+            for(var j=0;j<resp.length;j++){
+                var p = document.createElement('p');
+                p.className = "recommendation";
+                p.innerHTML = resp[j].userid;
+                container.appendChild(p);
+            }
+        }
+        loggedIn.similar(parseSimilar,this);
+    </script>
+<h2>Security: OAuth-signing your API calls</h2>
+    It's impossible to secure the API calls on the client-side with JavaScript because it's not possible to store secrets on the client-side.<br />
+    That's why we still need a piece of server-side code in order to secure the API calls. Call this server-side page the signer page.<br />
+    When initializing sugestio you can add a signerURL to the options. When the API calls need to be secured, SugestioJS will get the signer page and pass the parameters of the API call in the POST parameters.<br />
+    The signer page can now use an OAuth library to create the Authorization header (with the OAuth parameters) and return this in XML-format.<br />
+    <br />
+    For extra security reasons, another signature has to be created and returned by the signer page. This signature will be added with the API call in the X-Sugestio-signature.<br />
+    The X-Sugestio-signature is a SHA-1 signature of:
+    <ol>
+        <li>Consumer_secret</li>
+        <li>Nonce</li>
+        <li>Userid</li>
+        <li>IP-address client</li>
+    </ol>
+    in the format: consumer_secret=consumer_secret&amp;oauth_nonce=&lt;oauth_nonce&gt;&amp;userid=&lt;userid&gt;&amp;client_ip=&lt;client_ip&gt;
+</body>
+</html>

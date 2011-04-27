@@ -4,9 +4,11 @@
 // http://dean.edwards.name/weblog/2005/10/add-event/
 function addEvent(element, type, handler) {
     // assign each event handler a unique ID
-    if (!handler.$$guid) handler.$$guid = addEvent.guid++;
+    if (!handler.$$guid)
+        handler.$$guid = addEvent.guid++;
     // create a hash table of event types for the element
-    if (!element.events) element.events = {};
+    if (!element.events)
+        element.events = {};
     // create a hash table of event handlers for each element/event pair
     var handlers = element.events[type];
     if (!handlers) {
@@ -21,14 +23,15 @@ function addEvent(element, type, handler) {
     // assign a global event handler to do all the work
     element["on" + type] = handleEvent;
 };
+
 // a counter used to create unique IDs
 addEvent.guid = 1;
 /*function removeEvent(element, type, handler) {
-    // delete the event handler from the hash table
-    if (element.events && element.events[type]) {
-        delete element.events[type][handler.$$guid];
-    }
-};*/
+ // delete the event handler from the hash table
+ if (element.events && element.events[type]) {
+ delete element.events[type][handler.$$guid];
+ }
+ };*/
 function handleEvent(event) {
     var returnValue = true;
     // grab the event object (IE uses a global event object)
@@ -44,6 +47,7 @@ function handleEvent(event) {
     }
     return returnValue;
 };
+
 // Add some "missing" methods to IE's event object
 function fixEvent(event) {
     // add W3C standard event methods
@@ -51,6 +55,7 @@ function fixEvent(event) {
     event.stopPropagation = fixEvent.stopPropagation;
     return event;
 };
+
 fixEvent.preventDefault = function () {
     this.returnValue = false;
 };
@@ -60,7 +65,7 @@ fixEvent.stopPropagation = function () {
 //injects a script to the page
 function addScript(src, onload) {
     var script = document.createElement('script'),
-        head = document.getElementsByTagName("head")[0];
+    head = document.getElementsByTagName("head")[0];
     script.src = src;
     script.type = 'text/javascript';
     if (onload) {
@@ -68,6 +73,7 @@ function addScript(src, onload) {
     }
     head.appendChild(script);
 }
+
 // for getting DOM Elements described by a CSS selector
 //easyXDM for cross domain messaging
 addScript("https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js");
@@ -75,105 +81,105 @@ addScript('SugestioJS/easyXDM/easyXDM.js');
 //first load easyXDM and jQuery, then SugestioJS
 function sugestioInit(sugestioOptions) {
     var remoteURL = "http://js.sugestio.com/michiel",
-        string = "string",
-        nmb = "number",
-        i = 0,
-        consumptions = "view rating wishlist basket purchase collection checkin".split(" "),
-        uuid = 0,
-        remoteCallbacks = {},
-        //helper function: checks the type of an object
-        is = function (o, type) {
-            type = type.toLowerCase();
-            return (type === "null" && o ===  null) ||
-                (type === "id" && (typeof o === "number" || typeof o === "string")) ||
-                (type === typeof o) ||
-                (type === "array" && Object.prototype.toString.call(o) ===  '[object Array]') ||
-                (type === "object" && o ===  Object(o) && Object.prototype.toString.call(o) !==  '[object Array]');
-        },
-        //easyXDM remote call: see documentation
-        remoteCall = function (method, params, callbacks) {
-            var id = uuid++,
-                request = JSON.stringify({
-                    method: method,
-                    params: params,
-                    id: id
-                });
-            remoteCallbacks[id] = callbacks;
-            socket.postMessage(request, remoteURL);
-        },
-        //User class
-        User = function (id) {
-            if (is(id, "id")) {
-                this.id = id;
-            } else {
-                this.id = null;
-            }
-        },
-        //Item class
-        Item = function (id) {
-            if (is(id, "id")) {
-                this.id = id;
-            } else {
-                this.id = null;
-            }
-        },
-        S = { //sugestio object
-            //sugestio.user: returns the User class
-            //static functions of the User class are functions binded to this function
-            //regular functions are functions bind to the User class
-            user: function (a, b) { 
-                var id = null;
-                //(func, scope) OR
-                //(userid)
-                if (is(a, "function")) {
-                    if (is(b, "object")) {
-                        id = a.apply(b, []);
-                    } else {
-                        id = a.apply(this, []);
-                    }
-                } else {
-                    id = a;
-                }
-                return new User(id);
-            },
-            //sugestio.item: returns the User class
-            //static functions of the User class are functions binded to this function
-            //regular functions are functions bind to the Item class
-            item: function (a, b) {
-                var id = null;
-                //(func, scope) OR
-                //(itemid)
-                if (is(a, "function")) {
-                    if (is(b, "object")) {
-                        id = a.apply(b, []);
-                    } else {
-                        id = a.apply(this, []);
-                    }
-                } else {
-                    id = a;
-                }
-                return new Item(id);
-            },
-            options: sugestioOptions
-        },
-        //easyXDM socket for communicating between 2 iframes
-        socket = new easyXDM.Socket({
-            local: "index.html",
-            remote: remoteURL + "/index.html",
-            onReady: function () {
-                //if we want to do something when the socket is ready
-            },
-            onMessage: function (message, origin) {
-                //console.log(message);
-                var response = JSON.parse(message),
-                    id = response.id;
-                if (response.result) {
-                    remoteCallbacks[id].success(response.result);
-                } else {
-                    remoteCallbacks[id].error(response.message);    
-                }
-            }
+    string = "string",
+    nmb = "number",
+    i = 0,
+    consumptions = "view rating wishlist basket purchase collection checkin".split(" "),
+    uuid = 0,
+    remoteCallbacks = {},
+    //helper function: checks the type of an object
+    is = function (o, type) {
+        type = type.toLowerCase();
+        return (type === "null" && o ===  null) ||
+        (type === "id" && (typeof o === "number" || typeof o === "string")) ||
+        (type === typeof o) ||
+        (type === "array" && Object.prototype.toString.call(o) ===  '[object Array]') ||
+        (type === "object" && o ===  Object(o) && Object.prototype.toString.call(o) !==  '[object Array]');
+    },
+    //easyXDM remote call: see documentation
+    remoteCall = function (method, params, callbacks) {
+        var id = uuid++,
+        request = JSON.stringify({
+            method: method,
+            params: params,
+            id: id
         });
+        remoteCallbacks[id] = callbacks;
+        socket.postMessage(request, remoteURL);
+    },
+    //User class
+    User = function (id) {
+        if (is(id, "id")) {
+            this.id = id;
+        } else {
+            this.id = null;
+        }
+    },
+    //Item class
+    Item = function (id) {
+        if (is(id, "id")) {
+            this.id = id;
+        } else {
+            this.id = null;
+        }
+    },
+    S = { //sugestio object
+        //sugestio.user: returns the User class
+        //static functions of the User class are functions binded to this function
+        //regular functions are functions bind to the User class
+        user: function (a, b) {
+            var id = null;
+            //(func, scope) OR
+            //(userid)
+            if (is(a, "function")) {
+                if (is(b, "object")) {
+                    id = a.apply(b, []);
+                } else {
+                    id = a.apply(this, []);
+                }
+            } else {
+                id = a;
+            }
+            return new User(id);
+        },
+        //sugestio.item: returns the User class
+        //static functions of the User class are functions binded to this function
+        //regular functions are functions bind to the Item class
+        item: function (a, b) {
+            var id = null;
+            //(func, scope) OR
+            //(itemid)
+            if (is(a, "function")) {
+                if (is(b, "object")) {
+                    id = a.apply(b, []);
+                } else {
+                    id = a.apply(this, []);
+                }
+            } else {
+                id = a;
+            }
+            return new Item(id);
+        },
+        options: sugestioOptions
+    },
+    //easyXDM socket for communicating between 2 iframes
+    socket = new easyXDM.Socket({
+        local: "index.html",
+        remote: remoteURL + "/index.html",
+        onReady: function () {
+            //if we want to do something when the socket is ready
+        },
+        onMessage: function (message, origin) {
+            //console.log(message);
+            var response = JSON.parse(message),
+            id = response.id;
+            if (response.result) {
+                remoteCallbacks[id].success(response.result);
+            } else {
+                remoteCallbacks[id].error(response.message);
+            }
+        }
+    });
     User.prototype.url = "/sites/" + S.options.account + "/users";
     Item.prototype.url = "/sites/" + S.options.account + "/items";
     //if JSON2 is not supported natively by the browser, this API will do the (de)serialization
@@ -182,12 +188,12 @@ function sugestioInit(sugestioOptions) {
     //if the key ends with "El", we have to get the value of that DOM Element
     function getSubmitData(data) {
         var result = {},
-            i = 0,
-            dataKey, 
-            dataValue, 
-            endsWithEl, 
-            elements, 
-            newKey;
+        i = 0,
+        dataKey,
+        dataValue,
+        endsWithEl,
+        elements,
+        newKey;
         for (dataKey in data) {
             if (data.hasOwnProperty(dataKey)) {
                 dataValue = data[dataKey];
@@ -202,26 +208,26 @@ function sugestioInit(sugestioOptions) {
                         console.log("elements not given");
                     }
                     switch (elements.length) {
-                    case 1:
-                        result[newKey] = elements[0].value;
-                        break;
-                    default:
-                        //multiple elements are only allowed for radioboxes
-                        //TODO: verbeteren
-                        try {
-                            for (i = 0; i < elements.length; i++) {
-                                if (elements[i].nodeName ===  "INPUT" && elements[i].type ===  "radio") {
-                                    if (elements[i].checked) {
-                                        result[newKey] = elements[i].value;
-                                        break;
+                        case 1:
+                            result[newKey] = elements[0].value;
+                            break;
+                        default:
+                            //multiple elements are only allowed for radioboxes
+                            //TODO: verbeteren
+                            try {
+                                for (i = 0; i < elements.length; i++) {
+                                    if (elements[i].nodeName ===  "INPUT" && elements[i].type ===  "radio") {
+                                        if (elements[i].checked) {
+                                            result[newKey] = elements[i].value;
+                                            break;
+                                        }
+                                    } else {
+                                        throw "only radioboxes allowed";
                                     }
-                                } else {
-                                    throw "only radioboxes allowed";
                                 }
+                            } catch (err) {
+                                console.log(err);
                             }
-                        } catch (err) {
-                            console.log(err);
-                        }
                     }
                 } else {
                     result[dataKey] = dataValue;
@@ -230,6 +236,7 @@ function sugestioInit(sugestioOptions) {
         }
         return result;
     }
+
     //submits the request to the Sugestio API.
     //url: the REST page
     function submit(inputData, url) {
@@ -253,10 +260,10 @@ function sugestioInit(sugestioOptions) {
                 },
                 success: function (resp) {
                     var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
-                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                    auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
                     remoteCall('post', [url, {data: submitData, xauth: xauth, auth: auth}], {
                         success: function (resp) {
-                            //console.log(resp);
+                            return resp;
                         },
                         error: function (resp) {
                             console.log("ERROR with " + url + ": " + resp);
@@ -271,7 +278,7 @@ function sugestioInit(sugestioOptions) {
         } else {
             remoteCall('post', [url, {data: submitData}], {
                 success: function (resp) {
-                    //console.log(resp);
+                    return resp;
                 },
                 error: function (resp) {
                     console.log("ERROR with " + url + ": " + resp);
@@ -279,9 +286,10 @@ function sugestioInit(sugestioOptions) {
             });
         }
     }
+
     function deleteResource() {
         var id = this.id,
-            url = this.url + '/' + id + '.json';
+        url = this.url + '/' + id + '.json';
         if (S.options.secured) {
             $.ajax({
                 'type': 'POST',
@@ -293,10 +301,10 @@ function sugestioInit(sugestioOptions) {
                 },
                 success: function (resp) {
                     var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
-                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                    auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
                     remoteCall('del', [url, {xauth: xauth, auth: auth}], {
                         success: function (resp) {
-                            console.log(resp);
+                            return resp;
                         },
                         error: function (resp) {
                             console.log("ERROR with " + url + ": " + resp);
@@ -311,7 +319,7 @@ function sugestioInit(sugestioOptions) {
         } else {
             remoteCall('del', [url, {}], {
                 success: function (resp) {
-                    console.log(resp);
+                    return resp;
                 },
                 error: function (resp) {
                     console.log("ERROR with " + url + ": " + resp);
@@ -319,6 +327,7 @@ function sugestioInit(sugestioOptions) {
             });
         }
     }
+
     User.prototype.del = deleteResource;
     //static user.meta function
     S.user.del = function () {
@@ -329,7 +338,6 @@ function sugestioInit(sugestioOptions) {
     S.item.del = function () {
         Item.prototype.del.apply(User.prototype);
     };
-    
     //registers a listener to the trigger elements. If triggered, the request will be sent to the Sugestio API by the listener function
     function registerListener(listener, inputData, url, triggers) {
         if (!is(triggers, "array") && is(triggers, "object")) {
@@ -339,37 +347,39 @@ function sugestioInit(sugestioOptions) {
             for (i = 0; i < triggers.length; i++) {
                 //console.log(triggers[i].nodeName);
                 switch (triggers[i].nodeName) {
-                case 'BUTTON':
-                    addEvent(triggers[i],'click', function () {
-                        listener.apply(listener,[inputData, url]);
-                    });
-                    break;
-                case 'INPUT':
-                    addEvent(triggers[i],'change', function () {
-                        if (this.checked) {
+                    case 'BUTTON':
+                        addEvent(triggers[i],'click', function () {
                             listener.apply(listener,[inputData, url]);
-                        }
-                    });
-                    break;
-                case 'FORM':
-                    addEvent(triggers[i],'submit', function () {
-                        listener.apply(listener,[inputData, url]);
-                    });
-                    break;
+                        });
+                        break;
+                    case 'INPUT':
+                        addEvent(triggers[i],'change', function () {
+                            if (this.checked) {
+                                listener.apply(listener,[inputData, url]);
+                            }
+                        });
+                        break;
+                    case 'FORM':
+                        addEvent(triggers[i],'submit', function () {
+                            listener.apply(listener,[inputData, url]);
+                        });
+                        break;
                 }
             }
         } else {
             listener.apply(listener,[inputData, url]); //triggers is not an object or array => active the listener instantly
         }
     }
+
     function checkIdAndRegisterListener(listener) {
-        return function(obj,el){
+        return function(obj,el) {
             if (!is(obj.id, "id") && typeof obj.idEl ===  "undefined") {
                 obj.id = this.id;
             }
             registerListener(listener,obj, this.url, el);
         }
     }
+
     //user.meta function
     User.prototype.meta = checkIdAndRegisterListener(submit);
     //static user.meta function
@@ -393,6 +403,7 @@ function sugestioInit(sugestioOptions) {
             registerListener(submit,obj, url, el);
         };
     }
+
     for (i = 0;i < consumptions.length;i++) {
         User.prototype[consumptions[i]] = getConsumptionfunction (consumptions[i]);
         S[consumptions[i]] = getConsumptionfunction (consumptions[i]);
@@ -401,7 +412,7 @@ function sugestioInit(sugestioOptions) {
     User.prototype.recommendations = function (func, scope) {
         if (is(func, "function")) {
             var url = this.url,
-                id = this.id;
+            id = this.id;
             if (S.options.secured) {
                 $.ajax({
                     'type': 'POST',
@@ -413,7 +424,7 @@ function sugestioInit(sugestioOptions) {
                     },
                     success: function (resp) {
                         var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
-                            auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
                         remoteCall('get', [S.options.baseURL + url + '/' + id + '/recommendations.json', {xauth: xauth, auth: auth}], {
                             success: function (resp) {
                                 if (is(scope, "object")) {
@@ -454,7 +465,7 @@ function sugestioInit(sugestioOptions) {
     function similar(func, scope) {
         if (is(func, "function")) {
             var url = this.url,
-                id = this.id;
+            id = this.id;
             if (S.options.secured) {
                 $.ajax({
                     'type': 'POST',
@@ -466,7 +477,7 @@ function sugestioInit(sugestioOptions) {
                     },
                     success: function (resp) {
                         var xauth = resp.getElementsByTagName('X-Sugestio-oauth-hash')[0].firstChild.nodeValue,
-                            auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
                         remoteCall('get', [S.options.baseURL + url + '/' + id + '/similar.json', {xauth: xauth, auth: auth}], {
                             success: function (resp) {
                                 if (is(scope, "object")) {
@@ -503,6 +514,7 @@ function sugestioInit(sugestioOptions) {
             console.log("func not given");
         }
     }
+
     User.prototype.similar = similar;
     Item.prototype.similar = similar;
     //user.ratingWidget
@@ -510,7 +522,7 @@ function sugestioInit(sugestioOptions) {
         if (is(data, "object") && data.contentEl && data.itemid) {
             if (is(data.contentEl, "object") || is(data.contentEl, "array")) {
                 var elements = data.contentEl,
-                    i = 0;
+                i = 0;
                 for (i = 0; i < elements.length; i++) {
                     var el = elements[i];
                     displayRatingWidget.apply(this,[el, data]);
@@ -520,74 +532,82 @@ function sugestioInit(sugestioOptions) {
         //displays the rating widget in the DOM element
         function displayRatingWidget(el, data) {
             var itemid = data.itemid,
-                type = data.type;
+            type = data.type;
             switch (type) {
-            case 'star':
-                if (typeof data.max ===  "number" && typeof data.min ===  "number") {
-                    var span = document.createElement('span'),
+                case 'star':
+                    if (typeof data.max ===  "number" && typeof data.min ===  "number") {
+                        var span = document.createElement('span'),
                         i = 0,
                         inputEls = [];
-                    span.setAttribute('class', 'rating-widget');
-                    el.appendChild(span);
-                    for (i = data.min; i <= data.max; i++) {
-                        var label = document.createElement('label');
-                        label.setAttribute('class', 'star-grey');
-                        function doActionWithSiblings(actionPrev, actionNext) {
-                            var sibbling = this;
-                            while (sibbling) {
-                                actionPrev.apply(this, [sibbling]);
-                                sibbling = sibbling.previousSibling;
-                            }
-                            sibbling = this;
-                            sibbling = sibbling.nextSibling;
-                            while (sibbling) {
-                                actionNext.apply(this, [sibbling]);
+                        span.setAttribute('class', 'rating-widget');
+                        el.appendChild(span);
+                        for (i = data.min; i <= data.max; i++) {
+                            var label = document.createElement('label');
+                            label.setAttribute('class', 'star-grey');
+                            function doActionWithSiblings(actionPrev, actionNext) {
+                                var sibbling = this;
+                                while (sibbling) {
+                                    actionPrev.apply(this, [sibbling]);
+                                    sibbling = sibbling.previousSibling;
+                                }
+                                sibbling = this;
                                 sibbling = sibbling.nextSibling;
+                                while (sibbling) {
+                                    actionNext.apply(this, [sibbling]);
+                                    sibbling = sibbling.nextSibling;
+                                }
                             }
+
+                            label.onmouseover = function () {
+                                doActionWithSiblings.apply(this, [
+                                function (sibbling) {
+                                    sibbling.className = 'star-orange';
+                                },
+
+                                function (sibbling) {
+                                    sibbling.className = 'star-grey';
+                                }]);
+
+                            };
+                            label.onclick = function () {
+                                doActionWithSiblings.apply(this, [
+                                function (sibbling) {
+                                    sibbling.className = 'star-orange';
+                                    sibbling.onmouseover = null;
+                                },
+
+                                function (sibbling) {
+                                    sibbling.className = 'star-grey';
+                                    sibbling.onmouseover = null;
+                                }]);
+
+                            };
+                            var inputEl = document.createElement('input');
+                            inputEl.setAttribute('name', 'star');
+                            inputEl.className = 'star';
+                            inputEl.setAttribute('type', 'radio');
+                            inputEl.setAttribute('value', i);
+                            inputEls.push(inputEl);
+                            if (typeof data.formEl ===  "undefined") {
+                                data.rating = inputEl.value;
+                                this.rating(data, inputEl);
+                            }
+                            label.appendChild(inputEl);
+                            span.appendChild(label);
                         }
-                        label.onmouseover = function () {
-                            doActionWithSiblings.apply(this, [function (sibbling) {
-                                sibbling.className = 'star-orange';
-                            },
-                            function (sibbling) {
-                                sibbling.className = 'star-grey';
-                            }]);
-                        };
-                        label.onclick = function () {
-                            doActionWithSiblings.apply(this, [function (sibbling) {
-                                sibbling.className = 'star-orange';
-                                sibbling.onmouseover = null;
-                            },
-                            function (sibbling) {
-                                sibbling.className = 'star-grey';
-                                sibbling.onmouseover = null;
-                            }]);
-                        };
-                        var inputEl = document.createElement('input');
-                        inputEl.setAttribute('name', 'star');
-                        inputEl.className = 'star';
-                        inputEl.setAttribute('type', 'radio');
-                        inputEl.setAttribute('value', i);
-                        inputEls.push(inputEl);
-                        if (typeof data.formEl ===  "undefined") {
-                            data.rating = inputEl.value;
-                            this.rating(data, inputEl);
+                        if (typeof data.formEl !==  "undefined" && data.formEl) {
+                            data.ratingEl = inputEls;
+                            var formEl = data.formEl;
+                            delete data.formEl;
+                            this.rating(data, formEl);
                         }
-                        label.appendChild(inputEl);
-                        span.appendChild(label);
+                    } else {
+                        console.log('min and max not given');
                     }
-                    if (typeof data.formEl !==  "undefined" && data.formEl) {
-                        data.ratingEl = inputEls;
-                        var formEl = data.formEl;
-                        delete data.formEl;
-                        this.rating(data, formEl);
-                    }
-                } else {
-                    console.log('min and max not given');
-                }
-                break;
+                    break;
             }
         }
+
     };
     window.sugestio = S;
 }

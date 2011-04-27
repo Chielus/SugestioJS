@@ -114,7 +114,7 @@ Just pass the DOM element(s) as the second parameter
 	<script type="text/javascript">
 	    sugestio.user(3).view({
 	        itemid: 1
-	    },document.getElementById("button#view1"));
+	    },document.getElementById("view1"));
 	</script>
 
 In case you want to bind a Sugestio call to a form, you have to command SugestioJS to get the values from the corresponding DOM elements:

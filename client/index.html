@@ -15,9 +15,6 @@ p.recommendation{
 <script type="text/javascript" src="sizzle.js"></script>
 <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
 <script type="text/javascript">
-    function htmlEntities(str) {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
     var options = {
         secured: false,
         account: 'sandbox',
@@ -29,6 +26,7 @@ p.recommendation{
 </head>
 <body>
 <h1>SugestioJS Tutorial</h1>
+<p>If you want to test the following examples, you can use the <a href="live.html">live tutorial</a>.</p>
 <h2><a name=initialization></a>Initialization</h2>
 <p>To init SugestioJS you have to pass some options. This can be done by calling the global function sugestioInit</p>
 <pre>
@@ -65,6 +63,29 @@ p.recommendation{
     sugestio.user(1).rating({itemid: 2, detail: &#x27;STAR:0:5:4&#x27;});
     sugestio.rating({itemid: 2, userid: 1, detail: &#x27;STAR:0:5:4&#x27;});
 </code></pre>
+<p>For submitting data or consumptions to Sugestio you can also listen to events of the DOM. Just pass the DOM element(s) as the second parameter</p>
+<pre><code>
+    &lt;button type=&quot;button&quot; id=&quot;view1&quot; class=&quot;view&quot;&gt;View item 1&lt;/button&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        sugestio.user(3).view({
+            itemid: 1
+        },document.getElementById(&quot;view1&quot;));
+    &lt;/script&gt;
+</code></pre>
+<p>In case you want to bind a Sugestio call to a form, you have to command SugestioJS to get the values from the corresponding DOM elements:</p>
+<pre><code>
+    &lt;form id=&quot;formUser&quot; method=&quot;post&quot; onsubmit=&quot;return false;&quot;&gt;
+        &lt;div class=&quot;rating-form&quot;&gt;
+            &lt;label&gt;Username: &lt;/label&gt;&lt;input type=&quot;text&quot; name=&quot;username&quot; value=&quot;&quot; /&gt;&lt;br /&gt;
+            &lt;label&gt;Gender: &lt;/label&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;M&quot; /&gt;&lt;input type=&quot;radio&quot; name=&quot;gender&quot; value=&quot;F&quot; /&gt;
+            &lt;script type=&quot;text/javascript&quot;&gt;
+                sugestio.user.meta({idEl: document.getElementsByName(&#x27;username&#x27;), genderEl: document.getElementsByName(&#x27;gender&#x27;)},document.getElementById(&#x27;formUser&#x27;));
+            &lt;/script&gt;
+            &lt;input type=&quot;submit&quot; value=&quot;Subscribe&quot; /&gt;
+            &lt;br /&gt;
+        &lt;/div&gt;
+    &lt;/form&gt;
+</code></pre>
 <h2><a name=recommendations></a>Getting recommendations</h2>
 <pre><code>
     &lt;div id=&#x27;recommendations&#x27;&gt;&lt;p&gt;&lt;strong&gt;Recommendations:&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
@@ -98,36 +119,5 @@ p.recommendation{
         loggedIn.similar(parseSimilar,this);
     &lt;/script&gt;
 </code></pre>
-<button type="button" id="view1" class="view">View item 1</button>
-<script type="text/javascript">
-	sugestio.user(3).view({
-		itemid: 1
-	},Sizzle("button#view1"));
-</script>
-
-<form id="formUser" method="post" onsubmit="return false;">
-<div class="rating-form">
-<label>Username: </label><input type="text" name="username" value="" /><br />
-<label>Gender: </label><input type="radio" name="gender" value="M" /><input type="radio" name="gender" value="F" />
-<script type="text/javascript">
-	sugestio.user.meta({idEl: Sizzle('input[name="username"]'), genderEl: Sizzle('input[name="gender"]')},document.getElementById('formUser'));
-</script>
-<input type="submit" value="Subscribe" />
-<br />
-</div>
-</form>
-<br />
-<form id="form2" method="post" onsubmit="return false;">
-    <label>Username2: </label><input type="text" name="username2" value="" /><br />
-    <input type="submit" value="View item with this username" />
-</form>
-<script type="text/javascript">
-    sugestio.user(3).del();
-    sugestio.view({
-        itemid: 'testitem',
-        useridEl: Sizzle('input[name="username2"]')
-    },Sizzle('#form2'));
-</script>
-<a href="item.php?id=2">Go to item 2</a>
 </body>
 </html>
