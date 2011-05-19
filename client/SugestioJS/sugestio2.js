@@ -74,8 +74,9 @@ function addScript(src, onload) {
     head.appendChild(script);
 }
 
+// for getting DOM Elements described by a CSS selector
 //easyXDM for cross domain messaging
-//addScript("https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js");
+addScript("https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js");
 addScript('SugestioJS/easyXDM/easyXDM.js');
 //first load easyXDM and jQuery, then SugestioJS
 
@@ -97,35 +98,9 @@ function sugestioInit(sugestioOptions) {
         type = type.toLowerCase();
         return (type === "null" && o ===  null) ||
         (type === "id" && (typeof o === "number" || typeof o === "string")) ||
-        (type === typeof o && type !== "object") ||
+        (type === typeof o) ||
         (type === "array" && Object.prototype.toString.call(o) ===  '[object Array]') ||
-        (type === "object" && o ===  Object(o) && Object.prototype.toString.call(o) !==  '[object Array]' );
-    },
-    // Serialize an array of form elements or a set of
-    // key/values into a query string
-    param = function( a, traditional ) {
-        var s = [],
-            add = function( key, value ) {
-                // If value is a function, invoke it and return its value
-                value = is(value, "function") ? value() : value;
-                s[ s.length ] = encodeURIComponent( key ) + "=" + encodeURIComponent( value );
-            };
-
-        // If an array was passed in, assume that it is an array of form elements.
-        if ( is(a, "array") || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
-            // Serialize the form elements
-            jQuery.each( a, function() {
-                add( this.name, this.value );
-            });
-
-        } else {
-            for ( var prefix in a ) {
-                buildParams( prefix, a[ prefix ], traditional, add );
-            }
-        }
-
-        // Return the resulting serialization
-        return s.join( "&" );
+        (type === "object" && o ===  Object(o) && Object.prototype.toString.call(o) !==  '[object Array]');
     },
     //easyXDM remote call: see documentation
     remoteCall = function (method, params, callbacks) {

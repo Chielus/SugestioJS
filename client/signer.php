@@ -1,6 +1,6 @@
 <?php
 //SIGNER page. Wordt aangesproken met AJAX om de X-Sugestio-oauth-hash aan te maken
-//X-Sugestio-oauth-hash = sha1(consumer_key="xxx"&consumer_secret="xxx-secret"&ip="w.x.y.z"&userid="id")
+//X-Sugestio-signature = sha1(consumer_secret="xxx"&oauth_nonce="nonce123"&userid="id"&client_ip="w.x.y.z")
 include_once dirname(__FILE__) . '/oauth-php/library/OAuthRequester.php';
 include_once dirname(__FILE__) . '/oauth-php/library/OAuthStore.php';
 
@@ -26,9 +26,7 @@ $params = json_decode($_POST['params'],true);
 if(is_null($params)){
     $params = array();
 }
-$params = removeEmptiesFromArray($params);
 function removeEmptiesFromArray($array=array()) {
-
     foreach ($array as $key => $value) {
         if (is_null($value) || $value == "") {
             unset($array[$key]);
@@ -36,6 +34,8 @@ function removeEmptiesFromArray($array=array()) {
     }
     return $array;
 }
+$params = removeEmptiesFromArray($params);
+
 $req = new OAuthRequester($request, $method, $params);
 $req->sign(0,null,'');
 $header = $req->getAuthorizationHeader();
@@ -47,7 +47,7 @@ $doc->formatOutput = true;
 
 $r = $doc->createElement("auth-info");
 $doc->appendChild( $r );
-$hash = $doc->createElement("X-Sugestio-oauth-hash");
+$hash = $doc->createElement("X-Sugestio-signature");
 $hash->appendChild(
   $doc->createTextNode( sha1($str) )
 );

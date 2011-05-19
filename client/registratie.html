@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Registration example</title>
+        <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+        <script type="text/javascript">
+            var options = {
+                secured: false,
+                account: 'sandbox',
+                baseURL: 'http://js.sugestio.com'
+            }
+            sugestioInit(options);
+        </script>
+    </head>
+    <body>
+        <form id="formUser" method="post" onsubmit="return false;">
+            <label>Username: </label><input type="text" name="username" /><br />
+            <label>Gender: </label><input type="radio" name="gender" value="M" />M
+                                   <input type="radio" name="gender" value="F" />F
+            <script type="text/javascript">
+                sugestio.user.meta({idEl: document.getElementsByName('username'), genderEl: document.getElementsByName('gender')},document.getElementById('formUser'));
+            </script>
+            <input type="submit" value="Rate!" />
+        </form>
+    </body>
+</html>

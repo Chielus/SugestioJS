@@ -22,8 +22,8 @@ p.recommendation{
 
     <script type="text/javascript">
         var options = {
-            secured: true,
-            account: 'magento',
+            secured: false,
+            account: 'sandbox',
             signerURL: 'http://jsdemo.sugestio.com/demo/signer.php',
             baseURL: 'http://js.sugestio.com'
         }
@@ -38,7 +38,7 @@ p.recommendation{
 
     // submit item metadata for item with ID 2
     var item = sugestio.item(2);
-    item.meta({title: 'Item 2', category: ['A', 'B']});
+    item.meta({title: 'Item test', 'category': ['A', 'B']});
 
     // delete previous item metadata
     item.del();
@@ -74,16 +74,39 @@ p.recommendation{
             <br />
         </div>
     </form>
+    
+<p>Rating widget... //TODO: more text</p>
+    
+    <div id="rating-without-form"></div>
+    <script type="text/javascript">
+        sugestio.ratingWidget({userid: 1, itemid: 2, contentEl: document.getElementById("rating-without-form"), min: 1, max: 5, type: 'star'});
+    </script>
+    
+    or with a form:
+    
+    <form id="formRating" method="post" onsubmit="return false;">
+        <div id="rating-with-form"></div>
+        <input type="submit" value="Rate!" />
+    </form>
+    <script type="text/javascript">
+        sugestio.ratingWidget({userid: 1, itemid: 2, contentEl: document.getElementById("rating-with-form"), formEl: document.getElementById('formRating'), min: 1, max: 10, type: 'star'});
+    </script>
 
 <h2><a name=recommendations></a>Getting recommendations</h2>
 
-    <div id='recommendations'><p><strong>Recommendations:</strong></p></div>
+    <div id='recommendations'></div>
     <script type="text/javascript">
         //resp is an array of object literals. Elements is not obligatory
         function parseRecommendations(resp){
             var container = document.getElementById('recommendations');
+            var p = document.createElement('p');
+            var s = document.createElement('strong');
+            s.innerHTML = "Recommendations:";
+            p.appendChild(s);
+            container.appendChild(p);
+            //iterate over the response array
             for(var j=0;j<resp.length;j++){
-                var p = document.createElement('p');
+                p = document.createElement('p');
                 p.className = "recommendation";
                 p.innerHTML = resp[j].itemid;
                 container.appendChild(p);
@@ -93,13 +116,18 @@ p.recommendation{
         loggedIn.recommendations(parseRecommendations,this);
     </script>
     
-    <div id='similar'><p><strong>Similar users:</strong></p></div>
+    <div id='similar'></div>
     <script type="text/javascript">
         function parseSimilar(resp){
             var container = document.getElementById('similar');
+            var p = document.createElement('p');
+            var s = document.createElement('strong');
+            s.innerHTML = "Similar users:";
+            p.appendChild(s);
+            container.appendChild(p);
             //iterate over the response array
             for(var j=0;j<resp.length;j++){
-                var p = document.createElement('p');
+                p = document.createElement('p');
                 p.className = "recommendation";
                 p.innerHTML = resp[j].userid;
                 container.appendChild(p);
@@ -108,8 +136,8 @@ p.recommendation{
         loggedIn.similar(parseSimilar,this);
     </script>
 <h2>Security: OAuth-signing your API calls</h2>
-    It's impossible to secure the API calls on the client-side with JavaScript because it's not possible to store secrets on the client-side.<br />
-    That's why we still need a piece of server-side code in order to secure the API calls. Call this server-side page the signer page.<br />
+    It's impossible to secure the API calls on the client-side (with JavaScript) because secrets can't be stored on the client-side.<br />
+    That's why we still need a page with server-side code in order to secure the API calls, we call this server-side page the signer page.<br />
     When initializing sugestio you can add a signerURL to the options. When the API calls need to be secured, SugestioJS will get the signer page and pass the parameters of the API call in the POST parameters.<br />
     The signer page can now use an OAuth library to create the Authorization header (with the OAuth parameters) and return this in XML-format.<br />
     <br />
@@ -121,6 +149,6 @@ p.recommendation{
         <li>Userid</li>
         <li>IP-address client</li>
     </ol>
-    in the format: consumer_secret=consumer_secret&amp;oauth_nonce=&lt;oauth_nonce&gt;&amp;userid=&lt;userid&gt;&amp;client_ip=&lt;client_ip&gt;
+    X-Sugestio-signature = sha1(consumer_secret=consumer_secret&amp;oauth_nonce=&lt;oauth_nonce&gt;&amp;userid=&lt;userid&gt;&amp;client_ip=&lt;client_ip&gt;);
 </body>
 </html>

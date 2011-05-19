@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Rating example</title>
+        <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+        <script type="text/javascript">
+            var options = {
+                secured: false,
+                account: 'sandbox',
+                baseURL: 'http://js.sugestio.com'
+            }
+            sugestioInit(options);
+        </script>
+    </head>
+    <body>
+        <form id="formRating" method="post" onsubmit="return false;">
+            <label>Rating: </label><input type="radio" name="rating" value="1" />1
+                                   <input type="radio" name="rating" value="2" />2
+                                   <input type="radio" name="rating" value="3" />3
+            <script type="text/javascript">
+                var loggedIn = sugestio.user(1);
+                loggedIn.rating({itemid: 2, ratingEl: document.getElementsByName('rating'), min: 1, max: 3},document.getElementById('formRating'));
+            </script>
+            <input type="submit" value="Rate!" />
+        </form>
+    </body>
+</html>

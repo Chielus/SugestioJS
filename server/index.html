@@ -13,6 +13,16 @@
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 <script type="text/javascript">
+    // modification of the jQuery.param function: spaces are encoded by jQuery.param with + instead of %20. replace these back to %20
+    (function($, oldFunction){
+        $.param = function( a, traditional ) {
+            var s = oldFunction.apply(oldFunction,[a,traditional]);
+            // Return the resulting serialization
+            return s.replace( '+', '%20' );
+        };
+    })(jQuery,jQuery.param);
+</script>
+<script type="text/javascript">
     var socket = new easyXDM.Socket({
         local: "index.html",
         onMessage: function(message,origin){
@@ -25,29 +35,31 @@
             params.push(id);
             publicMethods[method].apply(this,params);
         }
-    });
-    var publicMethods = {
+    }),
+    publicMethods = {
         get: function(url, opts, id){
             $.ajax({
               type: 'GET',
               'url': url,
               'data': opts.data ? opts.data : [],
-              success: function(resp){
+              success: function(resp,textStatus,jqXHR){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       result: resp
                   });
               },
               error: function(jqXHR,textStatus,errorThrown){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       message: errorThrown ? errorThrown : jqXHR.responseText
                   });
               },
               beforeSend: function (xhr) {
                   if(opts.auth && opts.xauth){
                       xhr.setRequestHeader ('Authorization', opts.auth);
-                      xhr.setRequestHeader ('X-Sugestio-oauth-hash', opts.xauth);
+                      xhr.setRequestHeader ('X-Sugestio-signature', opts.xauth);
                   }
               },
               dataType: 'json'
@@ -58,22 +70,24 @@
               type: 'POST',
               'url': url,
               'data': opts.data ? opts.data : [],
-              success: function(resp){
+              success: function(resp,textStatus,jqXHR){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       result: resp
                   });
               },
               error: function(jqXHR,textStatus,errorThrown){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       message: errorThrown ? errorThrown : jqXHR.responseText
                   });
               },
               beforeSend: function (xhr) {
                   if(opts.auth && opts.xauth){
                       xhr.setRequestHeader ('Authorization', opts.auth);
-                      xhr.setRequestHeader ('X-Sugestio-oauth-hash', opts.xauth);
+                      xhr.setRequestHeader ('X-Sugestio-signature', opts.xauth);
                   }
               },
               dataType: 'json'
@@ -84,22 +98,24 @@
               type: 'DELETE',
               'url': url,
               'data': opts.data ? opts.data : [],
-              success: function(resp){
+              success: function(resp,textStatus,jqXHR){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       result: resp
                   });
               },
               error: function(jqXHR,textStatus,errorThrown){
                   sendResponse({
                       id: id,
+                      httpCode: jqXHR.status,
                       message: errorThrown ? errorThrown : jqXHR.responseText
                   });
               },
               beforeSend: function (xhr) {
                   if(opts.auth && opts.xauth){
                       xhr.setRequestHeader ('Authorization', opts.auth);
-                      xhr.setRequestHeader ('X-Sugestio-oauth-hash', opts.xauth);
+                      xhr.setRequestHeader ('X-Sugestio-signature', opts.xauth);
                   }
               },
               dataType: 'json'

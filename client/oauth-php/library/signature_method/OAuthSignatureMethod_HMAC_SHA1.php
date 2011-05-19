@@ -54,7 +54,7 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod
 	 */
 	function signature ( $request, $base_string, $consumer_secret, $token_secret )
 	{
-		//echo urldecode($base_string);
+		//echo $base_string;
 		$key = $request->urlencode($consumer_secret).'&'.$request->urlencode($token_secret);
 		if (function_exists('hash_hmac'))
 		{
