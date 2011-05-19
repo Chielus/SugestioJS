@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <title>Recommendations</title>
+        <script type="text/javascript" src="SugestioJS/sugestio.js"></script>
+        <script type="text/javascript">
+        var options = {
+            secured: true,
+            account: 'magento',
+            signerURL: 'http://jsdemo.sugestio.com/demo/signer.php',
+            baseURL: 'http://js.sugestio.com'
+        }
+        sugestioInit(options);
+    </script>
+    </head>
+    <body>
+        <div id='recommendations'></div>
+        <script type="text/javascript">
+            //resp is an array of object literals. Elements is not obligatory
+            function parseRecommendations(resp){
+                var container = document.getElementById('recommendations');
+                var p = document.createElement('p');
+                var s = document.createElement('strong');
+                s.innerHTML = "Recommendations:";
+                p.appendChild(s);
+                container.appendChild(p);
+                //iterate over the response array
+                for(var j=0;j<resp.length;j++){
+                    p = document.createElement('p');
+                    p.className = "recommendation";
+                    p.innerHTML = resp[j].itemid;
+                    container.appendChild(p);
+                }
+            }
+            var loggedIn = sugestio.user(1);
+            loggedIn.recommendations(parseRecommendations,this);
+        </script>
+    </body>
+</html>
