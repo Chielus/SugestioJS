@@ -1,4 +1,4 @@
-// Event API by Dean Edwards in orde to simulate the W3C Event binding in IE browsers
+// Event API by Dean Edwards in order to simulate the W3C Event binding in IE browsers
 // addEvent/removeEvent written by Dean Edwards, 2005
 // with input from Tino Zijdel
 // http://dean.edwards.name/weblog/2005/10/add-event/
@@ -73,11 +73,8 @@ function addScript(src, onload) {
     }
     head.appendChild(script);
 }
-
 //easyXDM for cross domain messaging
-//addScript("https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js");
 addScript('SugestioJS/easyXDM/easyXDM.js');
-//first load easyXDM and jQuery, then SugestioJS
 
 /** 
 * Gets the sugestio instance
@@ -101,9 +98,36 @@ function sugestioInit(sugestioOptions) {
         (type === "array" && Object.prototype.toString.call(o) ===  '[object Array]') ||
         (type === "object" && o ===  Object(o) && Object.prototype.toString.call(o) !==  '[object Array]' );
     },
+    isEmptyObject = function (obj) {
+        for ( var name in obj ) {
+            return false;
+        }
+        return true;
+    },
+    buildParams = function (prefix, obj, add) {
+        if (is(obj, "array") && obj.length) {
+            // Serialize array item.
+            for(var i = 0; i < obj.length; i++){
+                var v = obj[i];
+                buildParams( prefix + "[" + ( typeof v === "object" || is(v, "array") ? i : "" ) + "]", v, add );
+            }
+        } else if ( obj != null && typeof obj === "object" ) {
+            if ( isEmptyObject( obj ) ) {
+                add( prefix, "" );
+            } else {
+                // Serialize object item.
+                for ( var name in obj ) {
+                    buildParams( prefix + "[" + name + "]", obj[ name ], add );
+                }
+            }
+        } else {
+            // Serialize scalar item.
+            add(prefix, obj);
+        }
+    },
     // Serialize an array of form elements or a set of
     // key/values into a query string
-    param = function( a, traditional ) {
+    param = function(a) {
         var s = [],
             add = function( key, value ) {
                 // If value is a function, invoke it and return its value
@@ -111,17 +135,8 @@ function sugestioInit(sugestioOptions) {
                 s[ s.length ] = encodeURIComponent( key ) + "=" + encodeURIComponent( value );
             };
 
-        // If an array was passed in, assume that it is an array of form elements.
-        if ( is(a, "array") || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
-            // Serialize the form elements
-            jQuery.each( a, function() {
-                add( this.name, this.value );
-            });
-
-        } else {
-            for ( var prefix in a ) {
-                buildParams( prefix, a[ prefix ], traditional, add );
-            }
+        for ( var prefix in a ) {
+            buildParams( prefix, a[ prefix ], add );
         }
 
         // Return the resulting serialization
@@ -209,6 +224,42 @@ function sugestioInit(sugestioOptions) {
         },
         options: sugestioOptions
     },
+    // gets the Authorization parameters
+    getAuthorizationParameters = function (data,success,error) {
+        // Create the request object
+        var xml = new XMLHttpRequest();
+        
+        // Open the asynchronous POST request
+        xml.open("POST", S.options.signerURL, true);
+        
+        // Set the content-type header, so that the server
+        // knows how to interpret the data that we're sending
+        xml.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        // Make sure the browser sends the right content length of the serialized data –
+        // Mozilla-based browsers sometimes have trouble with this
+        if ( xml.overrideMimeType ){
+            xml.setRequestHeader("Connection", "close");
+        }
+        
+        // Watch for when the state of the document gets updated
+        xml.onreadystatechange = function(){
+            // Wait until the data is fully loaded
+            if ( xml.readyState == 4 ) {
+                if(xml.responseXML){
+                    var resp = xml.responseXML,
+                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", ''),
+                        xauth = resp.getElementsByTagName('X-Sugestio-signature')[0].firstChild.nodeValue;
+                    success(auth,xauth);
+                } else {
+                    error(xml.status, xml.statusText);
+                }
+                xml = null;
+            }
+        };
+
+        // Establish the connection to the server and send the serialized data
+        xml.send( param( data ) );
+    },
     //easyXDM socket for communicating between 2 iframes
     socket = new easyXDM.Socket({
         local: "index.html",
@@ -231,6 +282,17 @@ function sugestioInit(sugestioOptions) {
     Item.prototype.url = "/sites/" + S.options.account + "/items";
     //if JSON2 is not supported natively by the browser, this API will do the (de)serialization
     easyXDM.DomHelper.requiresJSON("SugestioJS/easyXDM/json2.js");
+    // fix XMLHttpRequest object for IE 5 and IE 6
+    if ( typeof XMLHttpRequest == "undefined" ) {
+        XMLHttpRequest = function(){
+            // Internet Explorer uses an ActiveXObject to create a new
+            // XMLHttpRequest object
+            return new ActiveXObject(
+                // IE 5 uses a different XMLHTTP object from IE 6
+                navigator.userAgent.indexOf("MSIE 5") >= 0 ? "Microsoft.XMLHTTP" : "Msxml2.XMLHTTP"
+            );
+        };
+    }
     //gets the values for the Sugestio request
     //if the key ends with "El", we have to get the value of that DOM Element
     function getSubmitData(data) {
@@ -300,17 +362,13 @@ function sugestioInit(sugestioOptions) {
             }
         }
         if (S.options.secured) {
-            $.ajax({
-                'type': 'POST',
-                'url': S.options.signerURL,
-                'data': {
+            getAuthorizationParameters(
+                {
                     'request': S.options.baseURL + url,
                     'method': 'POST',
                     'params': JSON.stringify(submitData)
                 },
-                success: function (resp) {
-                    var xauth = resp.getElementsByTagName('X-Sugestio-signature')[0].firstChild.nodeValue,
-                    auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                function (auth, xauth) {
                     remoteCall('post', [url, {data: submitData, xauth: xauth, auth: auth}], {
                         success: function (resp) {
                             //console.log(resp);
@@ -320,11 +378,10 @@ function sugestioInit(sugestioOptions) {
                         }
                     });
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
+                function (status, textStatus) {
                     //console.log("error when contacting signer page");
-                },
-                dataType: 'xml'
-            });
+                }
+            );
         } else {
             remoteCall('post', [url, {data: submitData}], {
                 success: function (resp) {
@@ -340,17 +397,13 @@ function sugestioInit(sugestioOptions) {
         var id = id ? id : this.id,
         url = this.url + '/' + id + '.json';
         if (S.options.secured) {
-            $.ajax({
-                'type': 'POST',
-                'url': S.options.signerURL,
-                'data': {
+            getAuthorizationParameters(
+                {
                     'request': S.options.baseURL + url,
                     'method': 'DELETE',
                     'params': []
                 },
-                success: function (resp) {
-                    var xauth = resp.getElementsByTagName('X-Sugestio-signature')[0].firstChild.nodeValue,
-                    auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                function (auth, xauth) {
                     remoteCall('del', [url, {xauth: xauth, auth: auth}], {
                         success: function (resp) {
                             //console.log(resp);
@@ -360,11 +413,10 @@ function sugestioInit(sugestioOptions) {
                         }
                     });
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
+                function (status, textStatus) {
                     //console.log("error when contacting signer page");
-                },
-                dataType: 'xml'
-            });
+                }
+            );
         } else {
             remoteCall('del', [url, {}], {
                 success: function (resp) {
@@ -463,17 +515,13 @@ function sugestioInit(sugestioOptions) {
             var url = this.url,
             id = this.id;
             if (S.options.secured) {
-                $.ajax({
-                    'type': 'POST',
-                    'url': S.options.signerURL,
-                    'data': {
+                getAuthorizationParameters (
+                    {
                         'request': S.options.baseURL + url + '/' + id + '/recommendations.json',
                         'method': 'GET',
                         'params': []
                     },
-                    success: function (resp) {
-                        var xauth = resp.getElementsByTagName('X-Sugestio-signature')[0].firstChild.nodeValue,
-                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                    function (auth, xauth) {
                         remoteCall('get', [S.options.baseURL + url + '/' + id + '/recommendations.json', {xauth: xauth, auth: auth}], {
                             success: function (resp) {
                                 if (is(scope, "object")) {
@@ -491,11 +539,10 @@ function sugestioInit(sugestioOptions) {
                             }
                         });
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    function (status, textStatus) {
                         //console.log("error when contacting signer page");
-                    },
-                    dataType: 'xml'
-                });
+                    }
+                );
             } else {
                 remoteCall('get', [S.options.baseURL + url + '/' + id + '/recommendations.json', {}], {
                     success: function (resp) {
@@ -520,17 +567,13 @@ function sugestioInit(sugestioOptions) {
             var url = this.url,
             id = this.id;
             if (S.options.secured) {
-                $.ajax({
-                    'type': 'POST',
-                    'url': S.options.signerURL,
-                    'data': {
+                getAuthorizationParameters(
+                    {
                         'request': S.options.baseURL + url + '/' + id + '/similar.json',
                         'method': 'GET',
                         'params': []
                     },
-                    success: function (resp) {
-                        var xauth = resp.getElementsByTagName('X-Sugestio-signature')[0].firstChild.nodeValue,
-                        auth = resp.getElementsByTagName('Authorization')[0].firstChild.nodeValue.replace("Authorization: ", '');
+                    function (auth, xauth) {
                         remoteCall('get', [S.options.baseURL + url + '/' + id + '/similar.json', {xauth: xauth, auth: auth}], {
                             success: function (resp) {
                                 if (is(scope, "object")) {
@@ -544,11 +587,10 @@ function sugestioInit(sugestioOptions) {
                             }
                         });
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    function (status, textStatus) {
                         //console.log("error when contacting signer page");
-                    },
-                    dataType: 'xml'
-                });
+                    }
+                );
             } else {
                 remoteCall('get', [S.options.baseURL + url + '/' + id + '/similar.json', {}], {
                     success: function (resp) {
