@@ -495,7 +495,7 @@ function sugestioInit(sugestioOptions) {
         }
     };
     //similar function
-    function similar(func, scope) {
+    function similar(func) {
         if (is(func, "function")) {
             var url = S.options.baseURL + this.url + '/' + this.id + '/similar.json';
             executeSugestioCall(url, 'get', [], func, func);
