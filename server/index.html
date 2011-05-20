@@ -29,7 +29,7 @@
             //console.log("Server received a message from "+origin);
             //console.log(message);
             var request = JSON.parse(message);
-            var method = request.method,
+            var method = request.method.toLowerCase(),
                 params = request.params,
                 id = request.id;
             params.push(id);
@@ -93,7 +93,7 @@
               dataType: 'json'
             });
         },
-        del: function(url, opts, id){
+        'delete': function(url, opts, id){
             $.ajax({
               type: 'DELETE',
               'url': url,

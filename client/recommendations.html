@@ -18,17 +18,26 @@
             //resp is an array of object literals. Elements is not obligatory
             function parseRecommendations(resp){
                 var container = document.getElementById('recommendations');
-                var p = document.createElement('p');
-                var s = document.createElement('strong');
-                s.innerHTML = "Recommendations:";
-                p.appendChild(s);
-                container.appendChild(p);
-                //iterate over the response array
-                for(var j=0;j<resp.length;j++){
-                    p = document.createElement('p');
-                    p.className = "recommendation";
-                    p.innerHTML = resp[j].itemid;
+                console.log(resp);
+                if(resp.httpCode){
+                    console.log('k');
+                    var p = document.createElement('p');
+                    p.innerHTML = resp.message;
                     container.appendChild(p);
+                }
+                else{
+                    var p = document.createElement('p');
+                    var s = document.createElement('strong');
+                    s.innerHTML = "Recommendations:";
+                    p.appendChild(s);
+                    container.appendChild(p);
+                    //iterate over the response array
+                    for(var j=0;j<resp.length;j++){
+                        p = document.createElement('p');
+                        p.className = "recommendation";
+                        p.innerHTML = resp[j].itemid;
+                        container.appendChild(p);
+                    }
                 }
             }
             var loggedIn = sugestio.user(1);

@@ -272,9 +272,14 @@ function sugestioInit(sugestioOptions) {
             var response = JSON.parse(message),
             id = response.id;
             if (response.result) {
-                remoteCallbacks[id].success(response.result);
+                if(remoteCallbacks[id].success){
+                    remoteCallbacks[id].success(response.result);
+                }
+                
             } else {
-                remoteCallbacks[id].error(response);
+                if(remoteCallbacks[id].error){
+                    remoteCallbacks[id].error(response);
+                }
             }
         }
     });
@@ -297,12 +302,12 @@ function sugestioInit(sugestioOptions) {
     //if the key ends with "El", we have to get the value of that DOM Element
     function getSubmitData(data) {
         var result = {},
-        i = 0,
-        dataKey,
-        dataValue,
-        endsWithEl,
-        elements,
-        newKey;
+            i = 0,
+            dataKey,
+            dataValue,
+            endsWithEl,
+            elements,
+            newKey;
         for (dataKey in data) {
             if (data.hasOwnProperty(dataKey)) {
                 dataValue = data[dataKey];
@@ -353,6 +358,7 @@ function sugestioInit(sugestioOptions) {
     //url: the REST page
     function submit(inputData, url) {
         var submitData = getSubmitData(inputData);
+        url = S.options.baseURL + url;
         if (submitData.type ===  "RATING") {
             if (!is(submitData.max, "undefined") && !is(submitData.min, "undefined") && !is(submitData.rating, "undefined")) {
                 submitData.detail = 'STAR:' + submitData.max + ':' + submitData.min + ':' + submitData.rating;
@@ -361,72 +367,12 @@ function sugestioInit(sugestioOptions) {
                 delete submitData.rating;
             }
         }
-        if (S.options.secured) {
-            getAuthorizationParameters(
-                {
-                    'request': S.options.baseURL + url,
-                    'method': 'POST',
-                    'params': JSON.stringify(submitData)
-                },
-                function (auth, xauth) {
-                    remoteCall('post', [url, {data: submitData, xauth: xauth, auth: auth}], {
-                        success: function (resp) {
-                            //console.log(resp);
-                        },
-                        error: function (resp) {
-                            //console.log("ERROR with " + url + ": " + resp);
-                        }
-                    });
-                },
-                function (status, textStatus) {
-                    //console.log("error when contacting signer page");
-                }
-            );
-        } else {
-            remoteCall('post', [url, {data: submitData}], {
-                success: function (resp) {
-                    //console.log(resp);
-                },
-                error: function (resp) {
-                    //console.log("ERROR with " + url + ": " + resp);
-                }
-            });
-        }
+        executeSugestioCall(url,'post',submitData);
     }
     function deleteResource(id) {
         var id = id ? id : this.id,
-        url = this.url + '/' + id + '.json';
-        if (S.options.secured) {
-            getAuthorizationParameters(
-                {
-                    'request': S.options.baseURL + url,
-                    'method': 'DELETE',
-                    'params': []
-                },
-                function (auth, xauth) {
-                    remoteCall('del', [url, {xauth: xauth, auth: auth}], {
-                        success: function (resp) {
-                            //console.log(resp);
-                        },
-                        error: function (resp) {
-                            //console.log("ERROR with " + url + ": " + resp);
-                        }
-                    });
-                },
-                function (status, textStatus) {
-                    //console.log("error when contacting signer page");
-                }
-            );
-        } else {
-            remoteCall('del', [url, {}], {
-                success: function (resp) {
-                    //console.log(resp);
-                },
-                error: function (resp) {
-                    //console.log("ERROR with " + url + ": " + resp);
-                }
-            });
-        }
+            url = S.options.baseURL + this.url + '/' + id + '.json';
+        executeSugestioCall(url,'delete',[]);
     }
     User.prototype.del = deleteResource;
     //static user.meta function
@@ -509,54 +455,41 @@ function sugestioInit(sugestioOptions) {
         User.prototype[consumptions[i]] = getConsumptionfunction (consumptions[i]);
         S[consumptions[i]] = getConsumptionfunction (consumptions[i]);
     }
+    // executes a Sugestio call
+    function executeSugestioCall(url,type,data,success,error){
+        type = type.toUpperCase();
+        if (S.options.secured) {
+            getAuthorizationParameters (
+                // pass the Sugestio-request to the signer page
+                {
+                    'request': url,
+                    'method': type,
+                    'params': JSON.stringify(data)
+                },
+                // if authorization parameters received
+                function (auth, xauth) {
+                    remoteCall(type, [url, {data: data, xauth: xauth, auth: auth}], {
+                        success: success,
+                        error: error
+                    });
+                },
+                // if contacting the signer page failed
+                function (status, textStatus) {
+                    //console.log("error when contacting signer page");
+                }
+            );
+        } else {
+            remoteCall(type, [url, {}], {
+                success: success,
+                error: error
+            });
+        }
+    }
     //user.recommendations function
-    User.prototype.recommendations = function (func, scope) {
+    User.prototype.recommendations = function (func) {
         if (is(func, "function")) {
-            var url = this.url,
-            id = this.id;
-            if (S.options.secured) {
-                getAuthorizationParameters (
-                    {
-                        'request': S.options.baseURL + url + '/' + id + '/recommendations.json',
-                        'method': 'GET',
-                        'params': []
-                    },
-                    function (auth, xauth) {
-                        remoteCall('get', [S.options.baseURL + url + '/' + id + '/recommendations.json', {xauth: xauth, auth: auth}], {
-                            success: function (resp) {
-                                if (is(scope, "object")) {
-                                    func.apply(scope, [resp]);
-                                } else {
-                                    func.apply(this, [resp]);
-                                }
-                            },
-                            error: function (resp) {
-                                if (is(scope, "object")) {
-                                    func.apply(scope, [resp]);
-                                } else {
-                                    func.apply(this, [resp]);
-                                }
-                            }
-                        });
-                    },
-                    function (status, textStatus) {
-                        //console.log("error when contacting signer page");
-                    }
-                );
-            } else {
-                remoteCall('get', [S.options.baseURL + url + '/' + id + '/recommendations.json', {}], {
-                    success: function (resp) {
-                        if (is(scope, "object")) {
-                            func.apply(scope, [resp]);
-                        } else {
-                            func.apply(this, [resp]);
-                        }
-                    },
-                    error: function (resp) {
-                        //console.log("ERROR: " + resp);
-                    }
-                });
-            }
+            var url = S.options.baseURL + this.url + '/' + this.id + '/recommendations.json';
+            executeSugestioCall(url, 'get', [], func, func);
         } else {
             //console.log("func not given");
         }
@@ -564,47 +497,8 @@ function sugestioInit(sugestioOptions) {
     //similar function
     function similar(func, scope) {
         if (is(func, "function")) {
-            var url = this.url,
-            id = this.id;
-            if (S.options.secured) {
-                getAuthorizationParameters(
-                    {
-                        'request': S.options.baseURL + url + '/' + id + '/similar.json',
-                        'method': 'GET',
-                        'params': []
-                    },
-                    function (auth, xauth) {
-                        remoteCall('get', [S.options.baseURL + url + '/' + id + '/similar.json', {xauth: xauth, auth: auth}], {
-                            success: function (resp) {
-                                if (is(scope, "object")) {
-                                    func.apply(scope, [resp]);
-                                } else {
-                                    func.apply(this, [resp]);
-                                }
-                            },
-                            error: function (resp) {
-                                //console.log("ERROR: " + resp);
-                            }
-                        });
-                    },
-                    function (status, textStatus) {
-                        //console.log("error when contacting signer page");
-                    }
-                );
-            } else {
-                remoteCall('get', [S.options.baseURL + url + '/' + id + '/similar.json', {}], {
-                    success: function (resp) {
-                        if (is(scope, "object")) {
-                            func.apply(scope, [resp]);
-                        } else {
-                            func.apply(this, [resp]);
-                        }
-                    },
-                    error: function (resp) {
-                        //console.log("ERROR: " + resp);
-                    }
-                });
-            }
+            var url = S.options.baseURL + this.url + '/' + this.id + '/similar.json';
+            executeSugestioCall(url, 'get', [], func, func);
         } else {
             //console.log("func not given");
         }

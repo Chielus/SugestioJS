@@ -99,38 +99,52 @@ p.recommendation{
         //resp is an array of object literals. Elements is not obligatory
         function parseRecommendations(resp){
             var container = document.getElementById('recommendations');
-            var p = document.createElement('p');
-            var s = document.createElement('strong');
-            s.innerHTML = "Recommendations:";
-            p.appendChild(s);
-            container.appendChild(p);
-            //iterate over the response array
-            for(var j=0;j<resp.length;j++){
-                p = document.createElement('p');
-                p.className = "recommendation";
-                p.innerHTML = resp[j].itemid;
+            if(resp.httpCode){
+                var p = document.createElement('p');
+                p.innerHTML = resp.message;
                 container.appendChild(p);
+            }
+            else{
+                var p = document.createElement('p');
+                var s = document.createElement('strong');
+                s.innerHTML = "Recommendations:";
+                p.appendChild(s);
+                container.appendChild(p);
+                //iterate over the response array
+                for(var j=0;j<resp.length;j++){
+                    p = document.createElement('p');
+                    p.className = "recommendation";
+                    p.innerHTML = resp[j].itemid;
+                    container.appendChild(p);
+                }
             }
         }
         var loggedIn = sugestio.user(1);
-        loggedIn.recommendations(parseRecommendations,this);
+        loggedIn.recommendations(parseRecommendations);
     </script>
     
     <div id='similar'></div>
     <script type="text/javascript">
         function parseSimilar(resp){
             var container = document.getElementById('similar');
-            var p = document.createElement('p');
-            var s = document.createElement('strong');
-            s.innerHTML = "Similar users:";
-            p.appendChild(s);
-            container.appendChild(p);
-            //iterate over the response array
-            for(var j=0;j<resp.length;j++){
-                p = document.createElement('p');
-                p.className = "recommendation";
-                p.innerHTML = resp[j].userid;
+            if(resp.httpCode){
+                var p = document.createElement('p');
+                p.innerHTML = resp.message;
                 container.appendChild(p);
+            }
+            else{
+                var p = document.createElement('p');
+                var s = document.createElement('strong');
+                s.innerHTML = "Similar users:";
+                p.appendChild(s);
+                container.appendChild(p);
+                //iterate over the response array
+                for(var j=0;j<resp.length;j++){
+                    p = document.createElement('p');
+                    p.className = "similaruser";
+                    p.innerHTML = resp[j].userid;
+                    container.appendChild(p);
+                }
             }
         }
         loggedIn.similar(parseSimilar,this);
